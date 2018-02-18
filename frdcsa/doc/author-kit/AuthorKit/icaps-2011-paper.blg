@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
+The top-level auxiliary file: icaps-2011-paper.aux
+The style file: aaai.bst
+Database file #1: icaps-2011-paper.bib
+Warning--empty publisher in Balduccini06knowledgerepresentation
+Warning--empty journal in cio2006
+You've used 8 entries,
+            2568 wiz_defined-function locations,
+            620 strings with 5797 characters,
+and the built_in function-call counts, 2822 in all, are:
+= -- 294
+> -- 106
+< -- 3
++ -- 33
+- -- 33
+* -- 205
+:= -- 477
+add.period$ -- 40
+call.type$ -- 8
+change.case$ -- 46
+chr.to.int$ -- 8
+cite$ -- 10
+duplicate$ -- 119
+empty$ -- 206
+format.name$ -- 48
+if$ -- 574
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 7
+newline$ -- 50
+num.names$ -- 26
+pop$ -- 50
+preamble$ -- 1
+purify$ -- 55
+quote$ -- 0
+skip$ -- 95
+stack$ -- 0
+substring$ -- 97
+swap$ -- 25
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 60
+warning$ -- 2
+while$ -- 22
+width$ -- 10
+write$ -- 108
+(There were 2 warnings)

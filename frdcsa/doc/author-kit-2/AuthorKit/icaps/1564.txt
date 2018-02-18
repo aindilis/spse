@@ -1,0 +1,162 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+A PDDL+ Benchmark Problem: The Batch Chemical Plant
+Giuseppe Della Penna
+Dept. of Computer Science University of L’Aquila Italy
+
+Benedetto Intrigila
+Dept. of Mathematics University of Rome Tor Vergata Italy
+
+Daniele Magazzeni
+Dept. of Science University of Chieti Italy
+
+Fabio Mercorio
+Dept. of Computer Science University of L’Aquila Italy
+
+Abstract
+The PDDL+ language has been mainly devised to allow modelling of real-world systems, with continuous, timedependant dynamics. Several interesting case studies with these characteristics have been also proposed, to test the language expressiveness and the capabilities of the support tools. However, most of these case studies have not been completely developed so far. In this paper we focus on the batch chemical plant case study, a very complex hybrid system with nonlinear dynamics that could represent a challenging benchmark problem for planning techniques and tools. We present a complete PDDL+ model for such system, and show an example application where the UPMurphi universal planner is used to generate a set of production policies for the plant.
+
+1. Introduction
+The batch chemical plant is an academic case study, originally developed in (Kowalewski 1998), describing a chemical production cycle for concentrated saline solution. Its aim is to model a realistic hybrid system to experiment various model checking and planning techniques and tools. The system has been also studied in-depth as the subject of the European project VHS (Verimag 2000). It has been remarked (Fox, Howey, and Long 2005; Fox and Long 2006) that the chemical batch plant could be an interesting case study to fully exploit the modelling power of PDDL+ (Fox and Long 2001). Therefore, it could also represent a challenging benchmark for all the current planning tools that support this language. Indeed, the problem domain contains many tightly connected components and safety constraints, which make the actual effects of any action very difﬁcult to estimate. The general problem of synthesising a set of operating procedures (plan) for a chemical plant has been addressed several times in the literature (see, e.g., (Ivanov et al. 1980)). Typically, the problem solution involves the use of hierarchical non-linear planners to generate partial plans and reﬁne them until a feasible global plan is generated, following the plant ﬂow. Examples of such approach are, e.g., (Aylett et al. 1998), where the CEP domain-dependent planner is applied to a chemical processing case study, or (Viswanathan et al. 1998a), where the Grafchart methodology is used in
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+the iTOPS (Viswanathan et al. 1998b) tool for synthesising a detailed plan for a batch chemical process, or (Crooks and Macchietto 1992), where the goal of each subplan is solved as a mixed integer linear problem. However, the major issue of all these reﬁnement-based techniques is that, when the model presents a large number of constraints, detecting their violation, the invalidated subplans and the corresponding possible corrections may quickly become a very hard task. Therefore, so far a complete batch chemical plant like the one described in (Kowalewski 1998) has not been modelled in PDDL+, neither an automatic planning tool (possibly using an alternative input representation) has been applied to it. In this paper we propose a complete PDDL+ model for the batch chemical plant. Such model represents an interesting and advanced application of PDDL+, and we feel that it could also be a challenging benchmark problem for planning and universal planning tools. Indeed, we also describe a sample case study using the UPMurphi (Della Penna et al. 2009b) tool to perform universal planning (Schoppers 1987) on a signiﬁcant portion of the model, in order to generate a set of production policies for the plant.
+
+2. The Batch Chemical Plant
+The purpose of the batch chemical plant is to produce saline solution with a given concentration. If part of the product is not used, the plant can recycle it to restart another production cycle. The plant (shown in Figure 1) is composed of 7 tanks connected through a complex pipeline, whose ﬂow is regulated by 26 valves and two pumps. In particular, tank 5 is provided with a heater, whereas tank 6 is connected to a condenser. Finally, tanks 6 and 7 are surrounded by a cooling circuit. A set of sensors provide information to the plant controller about the ﬁlling level of tanks 1,2,3 and 5, the pump pressure and the condenser status. In the plant initial state, all the valves are closed, and the pumps, heaters and coolers are switched off. Tank 1 contains saline solution at a high concentration chigh , whereas tank 2 contains water. If tank 1 does not contain enough solution, the plant enters the startup phase: water from tank 2 is moved to tank 3, where a suitable amount of salt is added manually to reach
+
+222
+
+V2
+
+V3
+
+B1
+LIS 101 LIS 201 I 202 V9 B3
+
+B2
+
+V6
+
+V4
+
+• the content of each tank must not exceed the corresponding capacity limitations (Kowalewski 1998), which are lower than the tank volume. The plant dynamics is described in (Deparade 1999) by a set of differential equations that we omit for lack of space.
+
+V1
+
+I 102 V8
+
+V7
+
+V5
+
+salt
+LIS 301 V11 I 302
+
+H2O
+
+3. PDDL+ Modelling
+FIS 801
+
+B4
+
+K1
+LIS 401 V13
+
+cooling water
+
+V12
+
+B5
+LIS 501 IS 502 TI 503 V15 V16 LIS 601
+
+B6
+TIS 602
+
+cooling water
+
+V29 V14
+
+B7
+LIS 701 V17
+
+H2O
+
+cooling water
+
+TIS 702
+
+V10 V18
+
+V26
+
+V22 PIS 901
+
+V19 PIS 1001
+
+V25
+
+V28
+
+P1
+V23 V21
+
+V27
+
+V20 V24
+
+P2
+
+Figure 1: Overall structure of the chemical plant the required concentration, and ﬁnally pumped to tank 1. Note that tank 2 can be reﬁlled with water at any time by opening the appropriate input valve. When tanks 1 and 2 are appropriately ﬁlled, the plant can start the production phase. Tank 3 is partially ﬁlled with the solution from tank 1, which is then diluted using the water from tank 2 up to the requested concentration. The resulting saline solution can be taken from the output valve of tank 3. If the product is not completely used, the plant recycles it in the next production cycle. To this aim, the solution in tank 3 is moved to tank 4 and then to tank 5. Here, the solution is boiled by the heater until it reaches the concentration chigh , and then moved to tank 7. The steam produced by this process is piped to the condenser that ﬁlls tank 6 with the resulting water. Finally, tanks 6 and 7 are cooled and their contents are pumped to tanks 2 and 1, respectively. During the startup and production cycles the plant must obey some safety rules: • pumps can be switched on only if all the valves in their pipeline are open, • the heater cannot be switched on if tank 5 is empty, or the condenser is switched off, or if the valves involved in the heating/condensation process are closed, • only two cooling circuits (including the one used by the condenser) can be switched on at the same time, • tanks cannot be ﬁlled and emptied at the same time,
+
+In this paper, for sake of simplicity, we only describe the (more interesting) model of the production phase. This continuous, time-dependant domain is mainly modelled using processes, events and (ﬂexible) durative actions. Indeed, Figures 2, 4 and 5 show representative examples of such constructs extracted from the model (whose full source is available online in (Della Penna et al. 2009a)), which contains a total of 59 predicates, 55 functions (14 of which represent real values), 19 events, 10 durative actions and 11 processes. In the ﬁgures, Bx l , Bx c , Bx t indicate the ﬁlling level, solution concentration and temperature for tank x, respectively, whereas Vy, Py and Hy indicate valve, pump and heater y, respectively. Finally, the value of a constant k taken from the problem speciﬁcation is indicated with C k. In the following we describe the main elements of the PDDL+ model for the chemical plant production phase, highlighting their most interesting features. It is worth noting that the model has been written to adhere as much as possible to the formal speciﬁcation in (Deparade 1999). However, to further check its correctness, we used the UPMurphi tool (Della Penna et al. 2009b) to generate an optimal production plan, using our model applied to the initial conditions described in (Kowalewski 1998) and obtaining the same results (manually) devised in (Kowalewski 1998).
+
+3.1 Production Activities
+; f i l l i n g d u r a t i v e a c t i o n ( f o r t ank 3 ) ( : durative−action B 3 f i l l : parameters ( ) : duration ( >= ? d u r a t i o n 0 ) : condition ( and ( a t s t a r t ( not ( V8 ) ) ) ( a t s t a r t ( = ( B 3 l ) 0 ) ) ( a t s t a r t ( > = ( B 1 l ) 0 ) ) ( a t s t a r t ( not ( V3 ) ) ) ( a t s t a r t ( not ( V10 ) ) ) ( a t s t a r t ( not ( V11 ) ) ) ( a t s t a r t ( not ( B 3 f i l l e d ) ) ) ( a t end ( V8 ) ) ( over a l l ( >=( B 1 l ) 0 ) ) ) : e f f e c t ( and ( a t s t a r t ( B 3 f i l l i n g ) ) ( a t s t a r t ( V8 ) ) ( a t end ( not ( V8 ) ) ) ( a t end ( B 3 f i l l e d ) ) ( a t end ( not ( B 3 f i l l i n g ) ) ) ) ) ; f i l l i n g process ( f o r t ank 3 ) ( : process B 3 f i l l p r o c e s s : parameters ( ) : precondition ( B 3 f i l l i n g ) : e f f e c t ( and ( decrease ( B 1 l ) ( ∗ # t ( ∗ ( C 5 2 ) ( sqrt ( + ( / ( B1 l ) ( C h 1 3 ) ) 1 ) ) ) ) ) ( increase ( B3 l ) (∗ # t ( ∗ ( C 5 2 ) ( s q r t ( + ( / ( B1 l ) ( C h 1 3 ) ) 1 ) ) ) ) ) ) )
+
+Figure 2: Examples of durative actions and processes modelling the production phase
+
+223
+
+The production activities, such as moving the solution from a tank to another, cool it down, etc., some of which can possibly be executed in parallel, are modelled using durative actions. However, the duration of these activities is not known a priori, thus the planner should determine the time point at which the tank capacity (or required concentration, or temperature) is reached. To achieve this, we use duration inequalities in the durative actions. On the other hand, continuous changes to solution level, concentration and temperature in tanks are modelled through PDDL+ processes that update the corresponding model variables following the functions described in (Deparade 1999). This modelling schema guarantees an immediate detection (i.e., triggering of failure events) of safety violations. As an example, when tank 1 is nonempty, tank 3 is empty and some other conditions hold, the durative action B 3 f i l l shown in Figure 2 moves the solution from tank 1 to tank 3. The continuous update to the solution level in these tanks due to the action is performed by the process B 3 f i l l p r o c e s s , which is enabled by the durative action by setting to true the predicate B 3 f i l l i n g . The execution of this process may in turn trigger some events (Fox and Long 2003), e.g., B 3 l f a i l u r e (shown in Figure 4) that would invalidate the plan. At the end of the durative action (as chosen by the planner), B 3 f i l l i n g is set to false, and the ﬁlling process ends. It is worth noting that the effects of B 3 f i l l p r o c e s s involve the calculation of a square root, which is currently not supported by PDDL+. Therefore, we have also created and tested an approximated model (available in (Della Penna et al. 2009a)), where the square root is substituted by the second degree polynomial that best ﬁts such function within the bounds deducible from the model dynamics, as shown in Figure 3.
+( : process B 3 f i l l p r o c e s s : parameters ( ) : precondition ( B 3 f i l l i n g ) : e f f e c t ( and ( decrease ( B 1 l ) ( ∗ # t ( ∗ ( C 5 2 ) ( + (∗ −0.000415797 (∗ ( B1 l ) ( B1 l ) ) ) ( + ( ∗ ( B1 l ) 0.0424115 ) 1.00597 ) ) ) ) ) ( increase ( B3 l ) (∗ # t ( ∗ ( C 5 2 ) ( + (∗ −0.000415797 (∗ ( B1 l ) ( B1 l ) ) ) ( + ( ∗ ( B1 l ) 0.0424115 ) 1.00597 ) ) ) ) ) ) )
+
+; p i p e l i n e f l o w f a i l u r e ( d u r i n g B3 f i l l i n g process ) ( : event B 3 f l o w f a i l u r e : parameters ( ) : precondition ( and ( or ( V11 ) ( V10 ) ) ( or ( V8 ) ( V9 ) ) ) : e f f e c t ( not ( c o r r e c t o p e r a t i o n ) ) ) ; heater f a i l u r e ( on t ank 5 ) ( : event H 5 f a i l u r e : parameters ( ) : precondition ( or ( and ( H5 ) ( or ( V12 ) ( V15 ) ( V16 ) ) ) ( and ( H5 ) ( not ( V13 ) ) ) ( and ( H5 ) ( not ( > = ( B 5 l ) ( B5 l safe ) ) ) ) ) : e f f e c t ( not ( c o r r e c t o p e r a t i o n ) ) ) ; t ank f i l l i n g l i m i t f a i l u r e ( on t ank 3 ) ( : event B 3 l f a i l u r e : parameters ( ) : precondition ( or ( < ( B 3 l ) 0 ) ( > ( B 3 l ) ( B3 l max ) )) : e f f e c t ( not ( c o r r e c t o p e r a t i o n ) ) ) ; pump ( 2 ) f a i l u r e ( : event P 2 f a i l u r e : parameters ( ) : precondition ( and ( P2 ) ( not ( or ( and ( V25 ) ( V28 ) ) ( and ( V25 ) ( V5 ) ( V6 ) ) ( and ( V25 ) ( V5 ) ( V4 ) ( V2 ) ( V1 ) ( V3 ) ) ) ) ) : e f f e c t ( not ( c o r r e c t o p e r a t i o n ) ) )
+
+Figure 4: Examples of failure events Long 2005). As an example, event H 5 f a i l u r e in Figure 4 shows the PDDL+ model of an exogenous event. Such event is activated when the heater is switched on (H5 is true) and one of the valves 12, 15 or 16 is open ( or V12 V15 V16), or valve 13 is closed ( not V3), or the level of tank 5 is lower than the security level ( not ( >= B 5 l B 5 l s a f e )). Finally, the two events shown in Figure 5 are used to trigger the end of the plan. In particular, event p r o d u c t i o n e n d is triggered when tank 1 contains a sufﬁcient amount of solution with the required concentration, and its effect is to set the p r o d u c t i o n c o m p l e t e predicate to true. This, in turn, triggers a cascading event p r o d u c t i o n s u c c e s s that, if the plant has operated correctly (i.e., without violating any safety constraint) and all the valves and pumps have been correctly closed, sets the success predicate to true to indicate that the goal has been reached.
+
+Figure 3:
+
+B3 fill process
+
+with approximated square root
+
+3.3 Production Problem
+The PDDL+ deﬁnition of the problem for the chemical plant production phase is quite straightforward. The domain is initialised by setting the function and predicate values to the ones obtained after the startup phase (see (Deparade 1999)), and the goal is to set the success predicate to true, minimising the t o t a l − t i m e .
+
+3.2 Production Events
+The violation of one of the safety constraints listed in Section 2 should trigger an instantaneous change that invalidates the plan. Therefore, such failures have been modelled through PDDL+ events, whose effect is to falsify the invariant predicate c o r r e c t o p e r a t i o n . It is worth noting that, in the chemical plant model, discrete and continuous changes are combined in the activation conditions of several events (Howey, Long, and Fox 2004), making their checking more complex, but still very important since they may invalidate the plan (Fox, Howey, and
+
+4. Experimentation
+As a ﬁrst application of the chemical plant model, we used the UPMurphi tool (Della Penna et al. 2009b) to automatically perform universal planning (Schoppers 1987) on the production phase, in order to generate a set of production
+
+224
+
+( : event p r o d u c t i o n e n d : parameters ( ) : precondition ( and ( B 1 f i l l e d ) ( >= ( B1 l ) ( B1 l target min ) ) ( < ( B1 l ) ( B1 l target max ) ) ( = ( B1 c ) ( B 1 c t a r g e t ) ) ( not ( producti on ended ) ) ) : e f f e c t ( and ( p r o d u c t i o n c o m p l e t e ) ( producti on ended ) ) ) ( : event p r o d u c t i o n s u c c e s s : parameters ( ) : precondition ( and ( not ( success ) ) ( production complete ) ( correct operation ) ( not ( or ( V1) ( V2 ) ( V3 ) ( V4) ( V5 ) ( V6 ) ( V7 ) ( V8 ) ( V9 ) ( V10 ) ( V11 ) ( V12 ) ( V13 ) ( V14 ) ( V15 ) ( V16 ) ( V17 ) ( V18 ) ( V19 ) ( V20 ) ( V21 ) ( V22 ) ( V23 ) ( V24 ) ( V25 ) ( V26 ) ( V27 ) ( V28 ) ( V29 ) ( P1 ) ( P2 ) ) ) ) : e f f e c t ( success ) )
+
+Figure 5: Cascading events triggering the goal policies with different requirements. To this aim, we input UPMurphi with the PDDL+ domain and problem, and deﬁne a start state cloud (see (Della Penna et al. 2009b)) where the amount of solution to be produced ( B 3 l t a r g e t ) varies in the range [1.5, 3.7] liters with steps of 0.1 (i.e., 23 different states). Note that, to obtain the ﬁnite state system needed by UPMurphi, the continuous variables of the model have been rounded up to the ﬁrst decimal, and the time has been discretised in steps of 10 seconds, as suggested in (Brinksma and Mader 2000). The whole universal plan took about 6000 seconds to be generated, and has a size of 246.3 megabytes. The results are in Table 1. The plant state space is 1017 . However, starting from the given start state cloud, the planner found that only about 30 million of such states were actually reachable, and for 24% of them it was able to generate an optimal plan to the goal. Plan execution lengths vary from 1920 to 2200 seconds.
+Reachable states States to goal (generated plans) Optimal plan length (min/max) 29, 968, 861 7, 154, 464 1920/2200 sec
+
+Table 1: Universal plan generation statistics
+
+5. Conclusions
+The complete PDDL+ model for the batch chemical plant is now available to the planning community, together with the preliminary results of the universal planning presented in this paper. As a complex benchmark problem, it can be used to validate PDDL+ tools, but also to highlight ﬂaws and suggest possible enhancements.
+
+References
+Aylett, R.; Soutter, J. K.; Petley, G. J.; and Chung, P. W. H. 1998. AI planning in a chemical plant domain. In Proc. ECAI 1998, 622–626.
+
+Brinksma, E., and Mader, A. 2000. Veriﬁcation and optimization of a PLC control schedule. In Proc. SPIN 2000, 73–92. Crooks, C., and Macchietto, S. 1992. A combined MILP and logic-based approach to the synthesis of operating procedures for batch plants. Chem. Eng. Comm. 114:117–144. Della Penna, G.; Intrigila, B.; Magazzeni, D.; and Mercorio, F. 2009a. Batch chemical plant PDDL+ model. http://www.di.univaq.it/gdellape/ lamoka/go/?page=chemical. Della Penna, G.; Intrigila, B.; Magazzeni, D.; and Mercorio, F. 2009b. UPMurphi: a tool for universal planning on PDDL+ problems. In Proc. ICAPS 2009, 106–113. AAAI Press. Deparade, A. 1999. A switched continuous model of VHS case study 1. Draft, University of Dortmund, http:// www-verimag.imag.fr/VHS/year1/cs11c.ps. Fox, M., and Long, D. 2001. PDDL+: An extension to PDDL2.1 for modelling planning domains with continuous time-dependent effects. Technical Report, Dept. of Computer Science, University of Durham. Fox, M., and Long, D. 2003. PDDL2.1: An extension to PDDL for expressing temporal planning domains. J. Artif. Intell. Res. 20:61–124. Fox, M., and Long, D. 2006. Modelling mixed discretecontinuous domains for planning. J. Artif. Intell. Res. 27:235–297. Fox, M.; Howey, R.; and Long, D. 2005. Validating plans in the context of processes and exogenous events. In Proc. IAAI 2005, 1151–1156. AAAI Press. Howey, R.; Long, D.; and Fox, M. 2004. Validating plans with exogenous events. In Proc. 23rd Workshop of the UK Planning and Scheduling Special Interest Group. Ivanov, V. A.; Kafarov, V. V.; Perov, V. L.; and Reznichenko, A. A. 1980. On algorithmization of the start-up of chemical productions. Engineering Cybernetics 18:104–110. Kowalewski, S. 1998. Description of VHS case study 1 ”Experimental Batch Plant”. Draft. University of Dortmund, Germany http://astwww.chemietechnik. uni-dortmund.de/˜vhs/cs1descr.zip. Schoppers, M. 1987. Universal plans of reactive robots in unpredictable environments. In Proc. IJCAI 1987. Verimag. 2000. ESPRIT-LTR project 26270 (veriﬁcation of hybrid systems). http://www-verimag. imag.fr/VHS/. Viswanathan, S.; Johnsson, C.; Srinivasan, R.; Venkatasubramanian, V.; and Arzen, K. E. 1998a. Automating operating procedure synthesis for batch processes: Part I. Knowledge representation and planning framework. Computers and Chemical Engineering 22(11):1673–1685. Viswanathan, S.; Mockus, L.; Venkatasubramanian, V.; Basu, P. K.; Mack, R.; Cherukat, P.; and Iskos, V. 1998b. iTOPS: An intelligent tool for operating procedures synthesis. Computers and Chemical Engineering 22(Supplement 1):S601 – S608.
+
+225
+
+

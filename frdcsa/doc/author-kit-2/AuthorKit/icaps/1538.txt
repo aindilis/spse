@@ -1,0 +1,260 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+Partially Informed Depth-First Search for the Job Shop Problem
+Carlos Menc´a and Mar´a R. Sierra and Ramiro Varela ı ı
+Department of Computer Science, University of Oviedo, 33271 Gij´ n (Spain) o e-mail: {uo156612, sierramaria, ramiro}@uniovi.es
+
+Abstract
+We propose a partially informed depth-ﬁrst search algorithm to cope with the Job Shop Scheduling Problem with makespan minimization. The algorithm is built from the well-known P. Brucker’s branch and bound algorithm. We improved the heuristic estimation of Brucker’s algorithm by means of constraint propagation rules and so devised a more informed heuristic which is proved to be monotonic. We conducted an experimental study across medium and large instances. The results show that the proposed algorithm reaches optimal solutions for medium instances taking less time than branch and bound and that for large instances it reaches much better lower and upper bounds when both algorithms are given the same amount of time.
+
+The remainder of the paper is structured as follows: In section 2 a formulation of the JSSP is given. Section 3 outlines the main characteristics of Brucker’s algorithm. In section 4 we describe the proposed partially informed depthﬁrst search algorithm. In section 5 we present a heuristic based on a constraint propagation method and prove its monotonicity. Section 6 reports the results of the experimental study. Finally, in section 7 we summarize the main conclusions and propose some ideas for future research.
+
+The Job Shop Scheduling Problem
+The Job Shop Scheduling Problem (JSSP) requires scheduling a set of N jobs {J1 , . . . , JN } on a set of M resources or machines {R1 , . . . , RM }. Each job Ji consists of a set of tasks or operations {θi1 , . . . , θiM } to be sequentially scheduled. Each task θil has a single resource requirement Rθil , a ﬁxed duration pθil and a start time stθil to be determined. The JSSP has three constraints: precedence, capacity and non-preemption. Precedence constraints translate into linear inequalities of the type: stθil + pθil ≤ stθi(l+1) . Capacity constraints translate into disjunctive constraints of the form: stv + pv ≤ stw ∨ stw + pw ≤ stv , if Rv = Rw . Nonpreemption requires assigning machines to operations without interruption during their whole processing time. The objective is to come up with a feasible schedule such that the completion time, i.e. the makespan, is minimized. This problem is denoted as J||Cmax in the α|β|γ notation. Below, a problem instance will be represented by a directed graph G = (V, A ∪ E). Each node in the set V represents an actual operation, with the exception of the dummy nodes start and end, which represent operations with processing time 0. The arcs of A are called conjunctive arcs and represent precedence constraints and the arcs of E are called disjunctive arcs and represent capacity constraints. E is partitioned into subsets Ei with E = ∪{i=1,...,M } Ei . Ei includes an arc (v, w) for each pair of operations requiring Ri . The arcs are weighted with the processing time of the operation at the source node. Node start is connected to the ﬁrst operation of each job and the last operation of each job is connected to node end. A feasible schedule S is represented by an acyclic subgraph GS of G, GS = (V, A ∪ H), where H = ∪i=1,...,M Hi , Hi being a processing ordering for the operations requiring Ri . The makespan is the cost of a critical
+
+Introduction
+The Job Shop Scheduling Problem (JSSP) is a paradigm of optimization and constraint satisfaction problems which has interested researchers over the last decades, due to its difﬁculty and its proximity to real-life problems. It is NP-hard in the strong sense (Garey and Johnson 1979) and is considered as one of the most intractable problems known so far. In this paper, we focus on the JSSP with makespan minimization and propose a partially informed depth-ﬁrst search algorithm to solve it. This algorithm is built from the well-known Peter Brucker’s branch and bound algorithm (Brucker, Jurisch, and Sievers 1994), which is, as far as we know, the most effective exact method to cope with this problem. We devised a new heuristic obtained from a lower bound calculation method proposed in (Carlier and Pinson 1990), which is based on constraint propagation rules, and we prove it is monotonic. We have conducted an experimental study across conventional medium and large instances to compare our approach with Brucker’s algorithm. The results show that for medium-size instances our approach reduces the time required to solve them by about 15%. For the largest instances, that in most of the cases cannot be optimally solved by any of them, our approach is able to reach much better lower and upper bounds when both algorithms are given the same time. In this case, our approach reduces the error with respect to the best known solutions by about 40%.
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+113
+
+θ11 R1
+0 2 4
+
+4
+
+θ12 R2
+3
+
+3
+
+θ13 R3
+1
+
+start
+
+0
+
+θ21 R1
+
+2
+
+θ 22 R3
+3
+
+3
+
+θ23 R 2
+3 3 2
+
+3
+
+end
+
+0
+
+2
+
+θ 31 R2
+
+3
+
+θ32 R1
+
+θ33 R3
+
+Figure 1: A feasible schedule to a problem with 3 jobs and 3 machines. Bold face arcs show a critical path whose length (makespan) is 12
+
+to the simpliﬁed problem is given by the so-called Jackson’s Preemptive Schedule (JPS), which is obtained in polynomial time by the algorithm proposed in (Carlier 1982). Upper bounds are obtained by means of the greedy G&T algorithm proposed in (Gifﬂer and Thomson 1960). Finally, Brucker’s algorithm exploits a constraint propagation method termed immediate selection (Carlier and Pinson 1989). This method allows to ﬁx additional disjuntive arcs so as the effective search tree is dramatically reduced. Brucker’s algorithm can easily solve almost any instance up to 10 jobs and 10 machines as well as many larger instances. In fact, the famous set of instances selected in (Applegate and Cook 1991) are considered very hard to solve due to the fact that the great majority of them are not solved by this algorithm.
+
+path and it is denoted as L(S). A critical path is a longest path from node start to node end. A critical path contains a set of critical blocks. A critical block is a maximal sequence, with length at least two, of consecutive operations in a critical path requiring the same machine. Figure 1 shows a solution graph for an instance with 3 jobs and 3 machines. In order to simplify expressions, we deﬁne the following notation for a feasible schedule. The head rv of an operation v is the cost of the longest path from node start to node v, i.e. it is the value of stv . The tail qv is deﬁned so as the value qv + pv is the cost of the longest path from v to end. Hence, rv + pv + qv is the makespan if v is in a critical path, otherwise, it is a lower bound. P Mv and SMv denote the predecessor and successor of v respectively on the machine sequence and P Jv and SJv denote the predecessor and successor operations of v respectively on the job sequence. A partial schedule is given by a subgraph of G where some of the disjunctive arcs are not ﬁxed yet. In such a schedule, heads and tails can be estimated as rv = max{ max {min rj +
+J⊆P (v) j∈J j∈J
+
+A Partially Informed Depth-First Search Algorithm
+In this section, we present a partially informed depth-ﬁrst search algorithm which looks for optimal schedules in the same search space as Brucker’s algorithm. We describe the state representation, the way of computing heuristic estimations and upper bounds, the expansion mechanism, a constraint propagation method that reduces the search space and the search strategy used by the algorithm.
+
+State Representation
+A search state n is given by a partial solution graph Gn = (V, A∪F Dn ), where F Dn denotes the disjunctive arcs ﬁxed in n. In the initial state F Dn = . Heads and tails in n are calculated by expressions (1) and (2). The cost of the best path from the initial state to n, denoted by g(n), is given by the largest cost path between nodes start and end in Gn . As g(n) is computed from n, it is always optimal no matter what path led to it. Hence, g(n) = g ∗ (n).
+
+pj }, rP Jv + pP Jv } (1)
+
+Heuristic Estimation
+For each generated state n, a heuristic estimation f (n) of the cost of the best solution reachable from n (i.e. the cost of the best path from the initial state to a goal constrained to pass through n) is computed. This estimation is based on problem splitting and constraint relaxations. Let O be the set of operations requiring the machine m. Scheduling operations in O accordingly to their heads and tails in n so as the value maxv∈O (stv + pv + qv ) is minimized is known as the One Machine Sequencing Problem (OMSP). The optimal solution to this problem for n is clearly a lower bound of f ∗ (n) = g ∗ (n) + h∗ (n), where h∗ (n) is the optimal cost from n to its nearest goal. However, the OMS problem is still NP-hard. So, a new relaxation is required in order to obtain a polynomially solvable problem. To do that, it is common to relax the non-preemption constraint. An optimal solution to the preemptive OMS problem is given by the Jackson’s Preemptive Schedule (JPS) (Carlier 1982). The JPS is calculated by the following algorithm: at any time t given by a head or the completion of an operation, from the minimum rv until all operations are completely scheduled, schedule the ready operation with the largest tail on machine m. Calculating the JPS has a complexity of O(k × log k), where
+
+qv = max{ max {
+J⊆S(v) j∈J
+
+pj + min qj }, pSJv + qSJv } (2)
+j∈J
+
+with rstart = qend = 0 and where P (v) denotes the disjunctive predecessors of v, i.e. operations requiring machine Rv which are scheduled before than v. Analogously, S(v) denotes the disjunctive successors of v.
+
+Brucker’s Algorithm
+As far as we know, the best exact method proposed so far to cope with the J||Cmax problem is the branch and bound algorithm due to P. Brucker et al. (Brucker, Jurisch, and Sievers 1994). This algorithm starts from the constraint graph for a given problem instance and proceeds to ﬁx disjunctive arcs subsequently. The key feature of the algorithm is a smart branching scheme that relies on ﬁxing arcs either in the same or in the opposite direction as they appear in a critical block of a feasible solution. Moreover, the algorithm exploits powerful methods to obtain accurate lower and upper bounds. Lower bound calculation is based on preemptive one machine sequencing problem relaxations. The optimal solution
+
+114
+
+Algorithm 1 G&T (state n). Calculates a heuristic solution S from a state n. O denotes the set of all operations and SC the set of scheduled operations 0. SC = {start}; while (SC = O) do 1. A = {v ∈ O \ SC; P (v) ∪ {P Jv } ⊂ SC}; 2. v ∗ = arg min{ru + pu ; u ∈ A}; 3. B = {v ∈ A; Rv = Rv∗ and rv < rv∗ + pv∗ }; 4. C = {v ∈ O \ SC; Rv = Rv∗ }; 5. w∗ = arg min{makespan of JPS(C \ {w}) after schedule w; w ∈ B}; 6. Schedule w∗ in S at a time rw∗ ; 7. Add w∗ to SC and update heads of operations not in SC; end while 8. return S and its makespan; k is the number of operations. Finally, f (n) is taken as the largest JPS over all machines. So, h(n) = f (n) − g(n) is an optimistic estimate of h∗ (n). Below, fJP S (n) and hJP S (n) denote these heuristic estimations for n.
+
+1) at least one operation v in a critical block B in GS , different from the ﬁrst operation of B, is processed in S before all operations of B. 2) at least one operation v in a critical block B in GS , different from the last operation of B, is processed in S after all operations of B. Now, let us consider a feasible schedule S being compatible with the disjunctive arcs ﬁxed in state n. Of course, S might be the schedule calculated by Algorithm 1. The solution graph GS has a critical path with critical blocks B1 , . . . , Bk . For block Bj = (uj , . . . , uj j ) the sets of opm 1 erations B A Ej = Bj \ {uj } and Ej = Bj \ {uj j } m 1 are called the bef ore-candidates and af ter-candidates respectively. For each before-candidate (after-candidate) a successor s of n is generated by moving the candidate beB fore (after) the corresponding block. An operation l ∈ Ej is moved before Bj by ﬁxing the arcs {l → i; i ∈ Bj \ {l}}. A Similarly, l ∈ Ej is moved after Bj by ﬁxing the arcs {i → l; i ∈ Bj \ {l}}. This expansion strategy is complete as it guaranties that at least one optimal solution is contained in the search graph. However, this strategy can be improved by ﬁxing additional arcs so as the search space is a complete tree. Let us conB A sider a permutation (E1 , . . . , E2k ) of all sets Ej and Ej . This permutation deﬁnes an ordering for successors generation. When a successor is created from a candidate Et , we can assume that all solutions reachable from n by ﬁxing the arcs corresponding to the candidates E1 , . . . , Et−1 will be explored from the successors associated to these candidates. So, for the successor state s generated from Et the following sets of disjunctive arcs can be ﬁxed: Fj = B {uj → i; i = uj , . . . , uj j }, for each Ej < Et and m 1 2 j j A Lj = {i → uj j ; i = u1 , . . . , umj −1 }, for each Ej < Et m in the permutation above. So the successors of a search tree node n generated from the permutation (E1 , . . . , E2k ) are B deﬁned as follows. For each operation l ∈ Ej generate a B search tree node s by ﬁxing the arcs F Ds = F Dn ∪ Sj , provided that the resulting partial solution graph has no cycles, with
+B Sj =
+B B Ei <Ej
+
+Upper Bounds
+As Brucker’s algorithm does, we introduce upper bound calculations in the depth-ﬁrst search counterpart. To do that, a variant of the well-known G&T algorithm proposed in (Gifﬂer and Thomson 1960) is used. The algorithm is issued from each expanded node so as it builds a schedule that includes all disjunctive arcs ﬁxed in that state. Note that the disjunctive arcs ﬁxed to obtain the schedule do not remain ﬁxed in that node. G&T is a greedy algorithm that produces a schedule in a number of N ∗ M steps. Algorithm 1 shows the G&T algorithm adapted to obtain upper bounds from a search state n. Remember that P (v) denotes the disjunctive predecessors of operation v in state n. In each iteration, the algorithm considers the set A comprising all operations v that can be scheduled next, i.e. all operations such that P (v) and P Jv are already scheduled (initially only operation start is scheduled). The operation v ∗ in A with the earliest completion time if it is scheduled next is determined, and a new set B is obtained with all operations v in A requiring the same machine as v ∗ that can start at a time lower than the completion time of v ∗ . Any of the operations in B can be scheduled next and the selected one is w∗ if it produces the least cost JPS for the remaining unscheduled operations on the same machine. Finally, the algorithm returns the built schedule S and the value of its makespan. The best upper bound computed so far, with makespan U B, is maintained so as generated states n having f (n) ≥ U B are pruned from the search space as they do not lead to better solutions.
+
+Fi ∪
+A B Ei <Ej
+
+Li ∪ {l → i : i ∈ Bj \{l}}.
+
+(3) A And for each operation l ∈ Ej generate a search tree node A s by ﬁxing the arcs F Ds = F Dn ∪ Sj with
+A Sj =
+B A Ei <Ej
+
+Fi ∪
+A A Ei <Ej
+
+Li ∪ {i → l : i ∈ Bj \{l}}. (4)
+
+Expansion Mechanism
+The expansion mechanism is based on the following theorem (Brucker, Jurisch, and Sievers 1994). Theorem 1. Let S and S be two schedules. If L(S ) < L(S), then one of the two following conditions holds:
+
+Fixing Additional Arcs by Constraint Propagation
+After adjusting heads and tails, new disjunctive arcs can be ﬁxed by the constraint propagation method due to Carlier and Pinson (Carlier and Pinson 1989), termed immediate selection. Below, I denotes the set of operations requiring a
+
+115
+
+Algorithm 2 PROCEDURE Select for all c, j ∈ I, c = j do if rc + pc + pj + qj ≥ U B then ﬁx the arc (j → c); end if end for given machine. For each operation j ∈ I, rj and qj denote the head and tail respectively of the operation j in the state n. Theorem 2. Let c, j ∈ I, c = j. If rc + pc + pj + qj ≥ U B, (5)
+
+In (Carlier and Pinson 1994), Carlier and Pinson propose an algorithm which is also based on JPS calculations to solve the primal problem in a time O(k log k), with k = |I|. So, all primal pairs can be computed in O(k 2 log k). We refer the interested reader to Carlier and Pinson’s or Brucker et al.’s papers. Analogously, if (c, J) is dual pair, qc cannot be lower than qJ = max{
+J ⊆J j∈J
+
+pj + min qj }.
+j∈J
+
+(10)
+
+j has to be processed before c in every solution reachable from state n that improves U B. The arc (j → c) is called direct arc and the procedure Select given in Algorithm 2 calculates all direct arcs for the state n in a time of order O(|I|2 ). The procedure Select can be combined with the method due to Carlier and Pinson that allows to improve heads and tails. This method is based on the following result. Theorem 3. Let c ∈ I and J ⊆ I\{c}. 1) If
+j∈J∪{c}
+
+So, if qc < qJ , we can set qc = qJ and then the procedure Select ﬁxes all dual arcs {c → j; j ∈ J}. All dual pairs can be obtained similarly. Finally, the algorithm used to ﬁx additional disjunctive arcs proceeds as follows: 1) calculation of all primal arcs for all machines, 2) calculation of new heads and tails, 3) calculation of all dual arcs for all machines, 4) calculation of new heads and tails. As new heads and tails are computed in steps 2 and 4 due to the additional arcs ﬁxed in steps 1 and 3, steps 1-4 should be repeated as long as new disjunctive arcs are ﬁxed.
+
+min rj +
+j∈J∪{c}
+
+pj + min qj ≥ U B,
+j∈J
+
+(6)
+
+Search Strategy
+Brucker’s algorithm uses a backtracking procedure and a simple dispatching rule for selecting the next successor node. When exploring a node, it computes all before and after candidates in a critical path, it then generates only one successor at a time which is explored next, giving priority to before (after) candidates with the smallest heads (tails resp.). By doing so, it only takes proﬁt from the heuristic estimations (lower bounds) for pruning those states n having f (n) ≥ U B. According to (Pearl 1984), the main advantage of this search strategy is the low use of memory. We propose here to use a depth-ﬁrst search strategy in which successors of a given state are sorted by nondecreasing values of f (·), so as the most promising of them are expanded ﬁrst. So, all successors of a state n are generated and stored before exploring any of them, i.e. n is expanded. In this way, the selection of the next node to explore is based on more knowledge from the problem domain than that of a single dispatching rule. In our algorithm this rule is used for breaking ties for nodes with the same value of f (·) as it has given better results than other methods such as considering g(·) values or the number of arcs ﬁxed in the node. Guiding the search by knowledge from the problem domain when traversing the search tree has important beneﬁts. The sooner good upper bounds are found, the more effective the immediate selection procedure is, what leads to reduce the search space, compute more accurate heuristic estimations, reach good upper bounds sooner and so on. This search strategy needs more memory resources than backtracking, as all successors of the states along the current branch are stored. Nevertheless, these requirements are still low, due to the depth-ﬁrst search.
+
+then in all solutions reachable from state n improving U B, the operation c has to be processed after all operations in J. 2) If pj + min qj ≥ U B, (7) min rj +
+j∈J j∈J∪{c} j∈J∪{c}
+
+then in all solutions reachable from state n improving U B, the operation c has to be processed before all operations in J. If condition 1) of the theorem above holds, then the arcs {j → c; j ∈ J} can be ﬁxed. These arcs are called primal arcs and the pair (J, c) is called primal pair. Similarly, if condition 2) holds, the dual arcs {c → j; j ∈ J} can be ﬁxed and (c, J) is a dual pair. In (Brucker, Jurisch, and Sievers 1994), an efﬁcient method is derived to calculate all primal and dual arcs. This method is based on the following ideas. If (J, c) is primal pair, the operation c cannot start at a time lower than rJ = max{min rj +
+J ⊆J j∈J j∈J
+
+pj }.
+
+(8)
+
+So, if rc < rJ , we can set rc = rJ and then the procedure Select ﬁxes all primal arcs {j → c; j ∈ J}. This fact leads to the following problem. Deﬁnition 1 (Primal problem). Let c ∈ I. Does there exist a primal pair (J, c) such that rc < rJ ? If it exists, ﬁnd rJ ∗ = max{rJ ; (J, c) is a primal pair}. (9)
+
+116
+
+Heuristic Improvement by Constraint Propagation
+To improve the heuristic estimations, we use the following strategy which is inspired in some ideas taken from (Carlier and Pinson 1990) for computing lower bounds for the JSSP. If we have a heuristic estimation f (n) for a state n and we can prove in any way that a solution with cost not greater than P ≥ f (n) may not be reachable from state n, then we can improve the heuristic estimation up to P + 1. In order to do that, we apply immediate selection to n considering the upper bound P + 1. This way, we are supposing that there exists a solution with makespan not greater than P (lower than P + 1) reachable from n. So, additional disjunctive arcs get ﬁxed and the resulting situation is a state, denoted nr , that in general is not a node of the search tree. However, any solution with cost not greater than P reachable from n must include all arcs ﬁxed in state nr . Hence, if the partial solution graph Gnr is inconsistent, such a solution cannot exist and then the estimation can be improved to P + 1. The inconsistency of Gnr can be established if one of the two following conditions holds: 1) Gnr contains a cycle. 2) A lower bound greater than P can be derived from Gnr . In the ﬁrst case the inconsistency is clear as all arcs ﬁxed in Gnr should be included in the ﬁnal solution graph and a solution graph must be acyclic. In the second case, even if Gnr has no cycles, there is an inconsistency as a solution with cost lower than or equal to P containing the arcs ﬁxed in Gnr cannot exist. In order to check this condition we use the lower bound given by fJP S (nr ). To compute the improved heuristic a dichotomic search in the interval [fJP S (n), U B − 1] is made. The new heuristic estimation, termed fIS , is computed as fIS (n) = P , where P is the smallest value in the interval that produces a graph Gnr without inconsistencies (after applying the immediate selection procedure with the upper bound P + 1). Note that the value P = fJP S (n) − 1 would produce an inconsistent graph Gnr as at least a lower bound equal to fJP S (n) would be derived from it. Analogously, P = U B − 1 would generate a graph Gnr = Gn , without any inconsistency, as the immediate selection method is applied to n with upper bound U B after n is generated and before computing this heuristic estimation for it. So, the new heuristic, denoted hIS , is obtained as hIS (n) = fIS (n) − g(n). It is clear that hIS (n) ≥ hJP S (n), for every state n. We now prove that hIS is monotonic. In this section, ri (n) denotes the head of operation i in the search state n. Analogously, qi (n) refers to its tail. SCS(n) is the set containing all successors of n. Lemma 1. Let n and n be two states such that n ∈ SCS(n). Then, ∀i, ri (n) ≤ ri (n ) and qi (n) ≤ qi (n ). Proof. Generating n from n requires ﬁxing at least one disjunctive arc in n without producing any cycle in Gn . So, every path from node start to node i in Gn belongs to Gn
+
+as well. As the head of operation i is computed across the paths from start to i it is clear that ∀i, ri (n) ≤ ri (n ). Analogously for tails, so qi (n) ≤ qi (n ). Lemma 2. Let n and n be two states such that n ∈ SCS(n). If an arc i → j gets ﬁxed by immediate selection with an upper bound P + 1 in n, then it will get ﬁxed in n with P + 1 as well. Proof. The immediate selection procedure ﬁxes an arc i → j in n if rj (n) + pi + pj + qi (n) ≥ P + 1. From Lemma 1, ∀k, rk (n ) ≥ rk (n) and qk (n ) ≥ qk (n), so rj (n ) + pi + pj + qi (n ) ≥ P + 1. Hence, i → j will be also ﬁxed in n by immediate selection. Corollary 1. Let n and n be two states such that n ∈ SCS(n). And let nr and nr be the resulting states from applying immediate selection to states n and n respectively considering the same upper bound. Then Gnr is a subgraph of Gnr and ∀i, ri (nr ) ≤ ri (nr ) and qi (nr ) ≤ qi (nr ) Proof. It is trivial from Lemma 2 that Gnr is a subgraph of Gnr , as F Dn ⊂ F Dn and every arc ﬁxed in n by immediate selection is ﬁxed in n as well. Also, from similar reasoning as in Lemma 1, heads and tails in Gnr are larger or at least equal than they are in Gnr as the set of paths from start to i and from i to end in Gnr are subsets of the corresponding sets of paths in Gnr . Lemma 3. Let n, n be two search states such that n ∈ SCS(n). Then fIS (n) ≤ fIS (n ). Proof. Let Gnr and Gnr be the resulting graphs of applying immediate selection with upper bound P + 1 to n and n respectively. To prove that fIS (n) ≤ fIS (n ) it is enough to see that for any P +1 that Gnr is inconsistent then Gnr is inconsistent as well. We analyze separately the two conditions for inconsistency given previously. 1) As Gnr is a subgraph of Gnr , if Gnr contains a cycle, then Gnr contains a cycle as well. 2) As ∀i, ri (nr ) ≤ ri (nr ) and qi (nr ) ≤ qi (nr ), any preemptive schedule for a machine in nr is a feasible preemptive schedule for the same machine in nr (but not conversely), so the Jackson’s Preemptive Schedule for every machine in nr is greater or equal than it is in nr and so fJP S (nr ) ≥ fJP S (nr ). Hence, if fJP S (nr ) > P , then fJP S (nr ) > P . So it follows that fIS (n) ≤ fIS (n ). Theorem 4. hIS is monotonic. Proof. From Lemma 3 we know fIS (n) ≤ fIS (n )∀n, n ∈ SCS(n). This is equivalent to g(n) + hIS (n) ≤ g(n ) + hIS (n ). As ∀s, g(s) is computed as the length of the largest path from start to end in Gs , the cost of the path from the initial state to s is always known and equal to g ∗ (s), no matter what path led to s. This implies that g(n ) − g(n) = c(n, n ), so hIS (n) ≤ c(n, n ) + hIS (n ). Hence, hIS is monotonic (equivalently consistent) and consequently admissible.
+
+Monotonicity of hIS
+
+117
+
+Remark 1. The results given by Lemma 2 and Corollary 1 assume that the states n and n ∈ SCS(n) are initially consistent with P + 1, i.e., their associated graphs are acyclic and fJP S (n) ≤ fJP S (n ) < P + 1. In other cases, it is trivial that Lemma 3 holds.
+
+Analysis of the Effectiveness of hIS
+As we have seen, the improved heuristic hIS is more informed than the original one hJP S , i.e. hIS (n) ≥ hJP S (n) for every state n, so it is expected that the number of nodes expanded by the partially informed depth-ﬁrst search algorithm is smaller with hIS than it is with hJP S . The reason for this is that the values of the function f (·) are larger, so more nodes are pruned from the condition f (n) ≥ U B and, at the same time, the evaluation function guides the search towards more promising regions of the search space so as better upper bounds are reached quickly. However, it is also clear that computing hIS takes more time than computing hJP S , so we have to consider whether or not the increase in time consumed by the heuristic is compensated by the reduction of the effective search space. To do that we considered some of the instances with 10 jobs and 10 machines that in our experiments have required more search time (namely ORB01, ORB03, FT10 and LA20). For each of them we have analyzed the difference between the two heuristic estimations and the number of nodes visited at different levels of the search space. As the number of arcs ﬁxed from a state to a successor is not constant, we have taken the number of disjunctive arcs ﬁxed in a node as its level, instead of the length or the cost of the path from the initial state to it. The initial state has no disjunctive arcs ﬁxed whereas the maximum number of arcs that can be ﬁxed for an instance with N jobs and M machines is given by the expression (N − 1) + (N − 1) . (11) maxArcs(N, M ) = M × 2 States having such a number of disjunctive arcs ﬁxed represent feasible schedules. However, the partially informed depth-ﬁrst search algorithm rarely reaches this situation, due to the condition f (n) ≥ U B that allows to prune the node n. Figure 2 shows the results from instance ORB01 (the results from ORB03, FT10 and LA20 are fairly similar). The x-axis represents the percentage of the disjunctive arcs ﬁxed (with respect to maxArcs(10, 10)). And the y-axis represents the average improvement in percent of hIS over hJP S , computed for each node n as hIS (n) − hJP S (n) . (12) hJP S (n) As we can observe, the average improvement is about 30% and it is more or less uniform for different values of the number of arcs ﬁxed in the states, with variations in only a very small fraction of the nodes at low and high levels of the search. Figure 3 illustrates the distribution of the states evaluated with respect to the number of disjunctive arcs ﬁxed. As we can observe they are normally distributed: the number of 100 ×
+2
+
+nodes evaluated at low levels is very small, then the number increases quickly for intermediate levels and ﬁnally it is very low again for levels close to the ﬁnal states. This is quite reasonable, as at the end most of the nodes get pruned and at the beginning the number of states is lower than it is at intermediate levels. The results given in ﬁgures 2 and 3 correspond to the search space traversed by the algorithm using the heuristic hIS . With hJP S there are only small variations due to the differences in the number of evaluated nodes. These results suggest us the possibility of using different heuristics at different levels. In particular we propose using hIS at low levels where there are few nodes and the decisions are more critical. At intermediate levels maybe the use of a low cost heuristic such as hJP S could be better as there are a very large number of states and the decisions are less critical. And ﬁnally, at the last levels where the decisions are much less critical and few nodes are visited the heuristic is not very relevant. So we propose using hIS up to a given level of the search in order to take the most critical decisions and then use hJP S in order to save time.
+120
+
+100
+
+Average improvement of hIS (%)
+
+80
+
+60
+
+40
+
+20
+
+0 0 20 40 60 % maxArcs(10,10) 80 100
+
+Figure 2: Distribution of heuristic improvements in the effective search space depending on the number of arcs ﬁxed
+
+180
+
+160
+
+140 Number of generated states
+
+120
+
+100
+
+80
+
+60
+
+40
+
+20
+
+0 0 20 40 60 % maxArcs(10,10) 80 100
+
+Figure 3: Distribution of states in the effective search space depending on the number of arcs ﬁxed
+
+118
+
+Table 1: Results for instances of size 10 × 10 DF BB 0% 20% 35% 50% 65% 80%
+
+100%
+
+Exp. 100,00 69,45 67,71 67,42 68,21 68,63 68,46 68,41 T.(s) 100,00 86,41 86,41 97,09 119,42 138,83 147,57 148,54
+
+BB
+
+Table 2: Results for selected instances DF 0% 20% 35% 50% 65% 80% 100%
+
+EUB 100,00 81,17 66,50 60,76 51,94 49,40 52,14 52,39 ELB 100,00 100,00 45,97 65,74 60,63 65,74 65,74 65,74 Table 3: Results for instances of size 20 × 15 DF BB 0% 20% 35% 50% 65% 80% 100% EUB 100,00 74,19 69,01 69,96 69,84 62,62 58,65 58,20 ELB 100,00 100,00 70,84 70,84 70,84 70,84 70,84 70,84
+
+Computational Results
+As we have pointed, we have conducted an experimental study to compare the proposed partially informed depth-ﬁrst search algorithm (DF ) with the original Brucker’s branch and bound algorithm (BB). We have considered three sets of benchmarks taken from the OR-library. Firstly, eighteen instances of size 10 × 10 (10 jobs and 10 machines): FT10, ABZ5-6, LA16-20 and ORB01-10. As all of these instances are easily solved by both algorithms, we report the average number of nodes expanded and time taken to reach an optimal schedule (and prove its optimality) in percentage with respect to those obtained by BB. Then, we considered the set of instances selected in (Applegate and Cook 1991) as very hard to solve: FT20 (size 20 × 5), LA21, LA24, LA25 (15 × 10), LA27, LA29 (20 × 10), LA38, LA40 (15 × 15), ABZ7, ABZ8 and ABZ9 (20 × 15). Finally, we considered the set of Taillard’s instances of size (20 × 15) together with ABZ7, ABZ8 and ABZ9. As most of these instances are not optimally solved by any of the algorithms, we consider the quality of the upper and lower bounds reached by BB in average with respect to the best known lower and upper bounds (taken from (Zhang et al. 2008)). Then we report the average error in the upper and lower bounds (EUB and ELB respectively) reached by DF with respect to those reached by BB. For the three sets of instances we have considered a number of levels to apply the improved heuristic hIS : 0, 20, 35, 50, 65, 80 and 100%. With level 0% the improved heuristic is not applied to any of the nodes. In the other cases, when the improved heuristic is not applied, we use the estimation f (n) = max(f (p), fJP S (n)), where p is the parent of state n. In all cases we report values averaged for all the instances of the set and normalized so as BB is given the value 100. The target machine was Linux (Ubuntu 9.04)
+
+on Intel Core 2 Quad Q9400 (2,66 GHz), 4 GB. RAM. Table 1 reports the results from the 10 × 10 instances. The average time taken by the BB algorithm is 5, 72 seconds and the average number of expanded nodes is 7184, 67. The ﬁrst remarkable result is that DF reduces the number of expanded nodes by about 30% with respect to BB. This number is almost the same disregarding the level of application of the improved heuristic (even if only hJP S is used). This is a little bit surprising as the differences between the two heuristic estimations are about 30% in average, as we have seen in the previous section. In our opinion this is due to the fact that these instances are easy to solve and the single heuristic hJP S is able to guide the search quite well. At the same time, the intensive use of hIS only contributes to increase the time taken so as the overall time is even greater than the time taken by BB when hIS is applied at a level beyond 35%. For these instances, applying hIS at a level in [0, 20] is the best choice and, in this case, the time is reduced by about 15% with respect to BB. Table 2 shows the results from the second set of instances. In this case all algorithms were run for 1 hour. The average error reached by BB is 5, 37% for upper bounds and 3, 42% for lower bounds with respect to the best known bounds. As we can observe, DF is better than BB in all cases. When hIS is used, the improvement in lower bounds is about 35% in all cases, independently of the level up to hIS is applied, with exception of the level 20%. This is due to the fact that the instance LA38 is solved optimally in this case and so the lower bound is much better than in the remaining ones. The fact that the lower bound is almost the same for all levels is quite reasonable due to the depth-ﬁrst search. The lower bound is the lowest f (·) of a node in the open list and, as the instances are very large, this value might correspond to a
+
+119
+
+successor of the initial state due to the fact that the algorithm is not able to expand all of these successors after one hour. For the same reason the lower bound at level 0% is the same as that of BB. However, the quality of the upper bounds improves in direct ratio with the level up to hIS is applied. In this case it is worth to exploit the improved heuristic beyond level 50%. In this case the improvement with respect to BB is about 50%. Moreover, BB does not reach an optimal solution to the instance FT20, whereas DF solves it in just a few seconds using hIS . Table 3 summarizes the results from the largest instances (size 20 × 15) obtained in 1 hour. These are extremely hard instances. The average error reached by BB is 13, 01% for upper bounds and 4, 18% for lower bounds with respect to the best known bounds. The results show similar tendency as those for the second set of instances. DF is always better than BB. In this case, the lower bounds reached by DF when hIS is used at any level are always the same due to the fact that these instances are even harder to solve. The upper bounds improve in direct ratio with the level up to hIS is used. However, in this case, it is worth to exploit the improved heuristic in the whole search space. Overall, the improvement in upper bounds quality with respect to BB is more than 40%. So, we can draw two main conclusions from this experimental study. The ﬁrst one is that DF is better than BB when both of them use the same heuristic information given by hJP S and the second one is that DF is able to improve when it is given more informed and time consuming heuristics, such as hIS , but in this case we have to be aware of the problem size and exploit this heuristic up to a level that depends on the problem size. In any case, for very large instances it is worth to exploit this heuristic during the whole search.
+
+(Korf 1985) or some combinations of depth-ﬁrst and bestﬁrst strategies in order to improve the lower bounds. We will also try to adapt the algorithms to cope with objective functions other than the makespan, which are in general more interesting from the point of view of real-life problems and, for the largest instances, we will consider weighted and nonadmissible heuristics in order to improve the efﬁciency at the cost of reaching suboptimal solutions.
+
+Acknowledgments
+We are grateful to the reviewers for their helpful comments. This research has been supported by the Spanish Ministry of Science and Education under research project MEC-FEDER TIN2007-67466-C02-01 and by the Principality of Asturias under grant FICYT-BP09105.
+
+References
+Applegate, D., and Cook, W. 1991. A computational study of the job-shop scheduling problem. ORSA Journal of Computing 3:149–156. Brucker, P.; Jurisch, B.; and Sievers, B. 1994. A branch and bound algorithm for the job-shop scheduling problem. Discrete Applied Mathematics 49:107–127. Brucker, P. 2004. Scheduling Algorithms. Springer, 4th edition. Carlier, J., and Pinson, E. 1989. An algorithm for solving the job-shop problem. Management Science 35(2):164–176. Carlier, J., and Pinson, E. 1990. A practical use of jackson’s preemptive schedule for solving the job shop problem. Annals of Operations Research 26:269–287. Carlier, J., and Pinson, E. 1994. Adjustment of heads and tails for the job-shop problem. European Journal of Operational Research 78:146–161. Carlier, J. 1982. The one-machine sequencing problem. European Journal of Operational Research 11:42–47. Dorndorf, U.; Pesch, E.; and Phan-Huy, T. 2000. Constraint propagation techniques for the disjunctive scheduling problem. Artiﬁcial Intelligence 122:189–240. Garey, M., and Johnson, D. 1979. Computers and Intractability. Freeman. Gifﬂer, B., and Thomson, G. L. 1960. Algorithms for solving production scheduling problems. Operations Research 8:487–503. Korf, R. E. 1985. Depth-ﬁrst iterative-deepening: An optimal admissible tree search. Artiﬁcial Intelligence 27:97– 109. Pearl, J. 1984. Heuristics: Intelligent Search strategies for Computer Problem Solving. Addison-Wesley. Zhang, C. Y.; Li, P.; Rao, Y.; and Guan, Z. 2008. A very fast TS/SA algorithm for the job shop scheduling problem. Computers and Operations Research 35:282–294.
+
+Conclusions
+We have proposed a partially informed depth-ﬁrst search algorithm to cope with the Job Shop Scheduling Problem with makespan minimization. This algorithm has been designed from the branch and bound algorithm proposed in (Brucker, Jurisch, and Sievers 1994), (Brucker 2004). We have also devised a new heuristic which is monotonic and it is more informed than the heuristic estimation used in the original Brucker’s algorithm. We have conducted an experimental study across three sets of medium, large and very large instances from the OR-library. The results show that the proposed algorithm outperforms the original branch and bound algorithm in the three sets. The improvement is due to the fact that the partially informed depth-ﬁrst search is able to exploit the heuristic knowledge much better than the single branch and bound strategy. We have done some experiments, not reported here, combining branch and bound with the improved heuristic and the results were not good, as the resulting algorithm takes much more time to reach the same solutions, or reaches worse solutions in a given time. As future work we plan to design new heuristic estimations based on more powerful constraint propagation rules, such as those proposed in (Dorndorf, Pesch, and Phan-Huy 2000), and exploit other search strategies such as IDA∗
+
+120
+
+

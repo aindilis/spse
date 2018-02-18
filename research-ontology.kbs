@@ -1,0 +1,2 @@
+("has-feature "("temporal-planner-fn" "LPG") "PDDL2.1")
+("has-expansion" ("planning-problem" "STP") "Standard Temporal Planning")

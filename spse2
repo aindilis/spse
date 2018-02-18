@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+use SPSE2;
+
+use UniLang::Agent::Agent;
+use UniLang::Util::Message;
+
+$UNIVERSAL::agent = UniLang::Agent::Agent->new
+  (Name => "SPSE2",
+   ReceiveHandler => \&Receive);
+$UNIVERSAL::spse2 = SPSE2->new();
+
+sub Receive {
+  my %args = @_;
+  $UNIVERSAL::spse2->ProcessMessage
+    (Message => $args{Message});
+}
+
+$UNIVERSAL::spse2->Execute();

@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+
+use KeyBindings;
+
+my $keybindings = KeyBindings->new();
+
+$keybindings->GenerateGUI();

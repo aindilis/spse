@@ -1,0 +1,249 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+Towards Finding Robust Execution Strategies for RCPSP/max with Durational Uncertainty
+Na Fu, Pradeep Varakantham, Lau Hoong Chuin
+School of Information Systems, Singapore Management University, Singapore na.fu.2007@phdis.smu.edu.sg, pradeepv@smu.edu.sg, hclau@smu.edu.sg
+
+Abstract
+Resource Constrained Project Scheduling Problems with minimum and maximum time lags (RCPSP/max) have been studied extensively in the literature. However, the more realistic RCPSP/max problems – ones where durations of activities are not known with certainty – have received scant interest and hence are the main focus of the paper. Towards addressing the signiﬁcant computational complexity involved in tackling RCPSP/max with durational uncertainty, we employ a local search mechanism to generate robust schedules. In this regard, we make two key contributions: (a) Introducing and studying the key properties of a new decision rule to specify start times of activities with respect to dynamic realizations of the duration uncertainty; and (b) Deriving the ﬁtness function that is used to guide the local search towards robust schedules. Experimental results show that the performance of local search is improved with the new ﬁtness evaluation over the best known existing approach.
+
+Introduction
+Much research in scheduling has assumed problems with deterministic durations. In real-world scheduling problems, unexpected external events such as manpower unavailability, weather changes, etc. lead to delays or advances in completion of activities, which can in turn have a signiﬁcant impact on the completion of the overall project. There has been a growing interest to account for such data uncertainty (Rodr´guez et al. 2009; Herroelen and Leus 2005) ı while providing optimized schedules. This paper also focusses on this important issue of duration uncertainty in scheduling problems. From the computational perspective, stochasticity adds a great deal of complexity to the underlying deterministic problems. For example, for the inﬁnite-resource project scheduling problem in which every processing time has two possible discrete values, the problem of computing the expected makespan (or any point on the cumulative distribution of the optimal makespan), is #P-hard (Hagstrom. 1988; M¨ hring 2001). It has also been shown that for the schedulo ing problem 1|stoch pj ; dj = d|E[ wj Uj ], the problem of
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+computing a policy (i.e. execution strategy) maximizing the probability that some job completes exactly at the deadline is PSPACE-hard (Dean, Goemans, and Vondr´ k 2004). a The concrete problems of interest in this paper are the Resource Constrained Project Scheduling Problems with minimum and maximum time lags (RCPSP/max), which are of great importance in manufacturing, logistics and project management. Though these problems have been shown to be NP-Hard (Bartusch, Mohring, and Radermacher 1988), local search based techniques (Demeulemeester. and Herroelen. 2002) have achieved great success in solving these problems. Taking a cue from this, we also employ local search techniques to solve RCPSP/max with durational uncertainty. More precisely, we focus on the issues of computing a robust makespan with proven probability of success and a local search method for deriving a policy that will achieve the robust makespan. A popular approach for tackling durational uncertainty in scheduling problems is to employ a hybrid of proactive and reactive methods (Vonder, Demeulemeester, and Herroelen 2007). In this approach, a robust baseline schedule is computed ofﬂine initially. This baseline schedule is then modiﬁed (if required) during execution reactively based on the occurrence of external events. In this paper, we focus only on the computation of a robust baseline schedule and assume that this schedule can then be modiﬁed (if necessary) by any of the existing reactive procedures. There have been approaches that have addressed the computation of this robust baseline schedule. A recent approach (Beck and Wilson 2007) provides techniques to compute this robust baseline schedule from a risk management perspective, where durations of activities are modeled as random variables. Given a level of risk 0 < ε ≤ 1, they compute a schedule with minimal (probabilistic) makespan, which has a probability of successful execution of at least 1 − ε over all realizations of the durational uncertainty. The main idea there was to compute a lower bound for the minimal probabilistic makespan by solving a deterministic problem. However, it considers problems where the underlying scheduling problem is a Job Shop Scheduling Problems (JSP), which is a much simpler problem than RCPSP/max. Another approach is to compute an execution strategy (also known commonly as schedule policy) such as a Partial Order Schedule (POS). This approach was adopted by (Lau,
+
+73
+
+Ou, and Xiao 2007), which combines techniques from robust optimization with classical local search to compute a POS that minimizes the robust makespan, V ∗ . The robust makespan is one where the probability that the actual realized makespan of the schedule derived from the POS does not exceed it is greater than 1 − ε, over all realizations of uncertainty. The key idea there was to apply the segregated linear decision rule (Chen et al. 2008) to represent start times of activities and then compute an upper bound for the robust makespan, which is in turn used for guiding the local search to ﬁnd a POS. The use of the segregated linear decision rule provides for computing the ﬁtness measure quickly. However, this advantage comes at a price in that the ﬁtness measure is a loose upper bound (which has the side effect of guiding the search into bad regions). In this paper, we address the issue of loose upper bounds with two key contributions: (a) we propose a new general non-linear decision rule; and (b) derive the ﬁtness measure of a POS irrespective of the durational uncertainty distributions with the new decision rule. By using the new ﬁtness measure to guide the local search, we were able to show a deﬁnitive improvement in performance through our experiments.
+
+Radermacher 1988), we only handle the general start-start form of time lag constraints in this paper. Given the level of risk, ε, the goal is then to ﬁnd a resource and time feasible schedule (an assignment of start times to activities) that minimizes the robust makespan (makespan is the completion time of the last activity).
+
+Partial Order Schedule
+A Partial Order Schedule (POS) (Policella et al. 2004) is a set of activities, which are partially ordered such that any schedule with total activity order that is consistent with the partial order is a resource and time feasible schedule. Mathematically, a POS can be represented by a graph where an activity is represented by a node and the edges represent the precedence constraints between the activities. Within a POS, each activity retains a set of feasible start times, which provides the ﬂexibility to respond to unexpected disruptions. To construct a POS, typically a feasible schedule is ﬁrst obtained using a simple greedy heuristic. Consequently, a chaining procedure is used to construct the POS. It should be noted the time lag constraints of RCPSP/max have already been incorporated in the underlying temporal constraints network which corresponds to a Simple Temporal Problem (Dechter, Meiri, and Pearl 1991) based on which the POS is constructed. Hence, we do not need to model time lags in the decision rule expressions henceforth.
+
+Background
+Notationally, a random variable is denoted by x, bold face ˜ lower case letters like x represent vectors and the corresponding tilde case such as ˜ denote a vector with variables x as elements.
+
+Robust Local Search Framework
+(Lau, Ou, and Xiao 2007) integrated techniques from robust optimization (Chen et al. 2008) with the classical local search and proposed a Robust Local Search Framework to tackle the RCPSP/max problem under duration uncertainty, summarized as follows. Segregated Linear Decision Rule In the segregated linear decision rule (SLDR) proposed by (Chen et al. 2008), each random variable z is represented by two segregated random ˜ ˜ variables z + and z − : ˜ z = z+ − z− ˜ ˜ ˜ z + = max{˜, 0} ˜ z z z = max{−˜, 0}. ˜ Thus, the uncertain processing time or duration of an activity is composed of three components: its mean d0 , ˜ lateness z + (i.e. max{d − d0 , 0}), and earliness z − (i.e. ˜ ˜ ˜ max{d0 − d, 0}) ˜ d = d0 + z + − z − . ˜ ˜ (2) For a normally distributed duration, i.e. z ∼ N {0, σ}, the ˜ respective values of mean and variance for the segregated variables can be summarized as: σ z E[˜+ ] = E[˜− ] = √ z 2π (3) (π − 1)σ 2 z V ar[˜+ ] = V ar[˜− ] = z . 2π In the context of scheduling, activities are either connected in series or in parallel, and hence the actual start times
+−
+
+RCPSP/max with Durational Uncertainty
+The RCPSP/max problem (Bartusch, Mohring, and Radermacher 1988) is deﬁned over a set of N activities {a1 , a2 ..., aN }. Each activity ai has an expected processing time of d0 and requires rik units of resource type k (k = i 1, 2..., K). Ck is the constant resource capacity for resource type k. Each activity has a start time of st(ai ) and end time of et(ai ), such that st(ai ) + d0 = et(ai ). In addition, there i exist a set E of temporal constraints between various activity min max pairs ai , aj of the form st(aj ) − st(ai ) ∈ [Tij , Tij ] called minimum and maximum time lags between the start times of two related activities. Note that in the deterministic case, additional temporal constraints that designate time lags between the end time and the start time of two related activities can be equally transformed in the general start-start form. Durational uncertainty corresponding to each activity ai is modeled using a random variable zi . Therefore, the dura˜ ˜ tion of an activity is speciﬁed as: di = d0 + zi , where zi can ˜ ˜ i correspond to any probability distribution, with an expected value of 0 and standard deviation σ. In this paper, we assume that these random variables, {˜i }, corresponding to duraz tional uncertainty are independent of each other. Note that for RCPSP/max instances where the end-start time lag constraint exists, the temporal constraint can be violated during execution. This is due to duration uncertainty, which causes the end time of activities to be uncertain and uncontrollable. Thus, as in RCPSP/max literature (Bartusch, Mohring, and
+
+(1)
+
+74
+
+of activities can be obtained by performing either a sum or maximum on a set of random variables. Under SLDR (Chen et al. 2008), upper bounds on both the sum and maximum of random variables are derived as linear functions of segregated variables. • Serial Activities In the case of a project network involving k activities, any two of which have either precedence constraints in between or competing for the same resource units, a solution in the form of POS requires these activities be executed in series. Thus, the end time of a serial k-activity project in SLDR is expressed as: ˜ z z Vk (˜+ , ˜− ) =
+k i=1
+
+(d0 + zi − zi ). ˜+ ˜− i
+
+(4)
+
+• Parallel Activities Consider activities that are executed concurrently, the upper bound of the end time of a parallel k-activity project network in SLDR is represented by a linear function of the positive segregated components of duration perturbations: ˜ z z Vk (˜+ , ˜− ) ≤ max {d0 } + i
+i=1,...k k i=1
+
+zi . ˜+
+
+(5)
+
+Robust Fitness Function In (Lau, Ou, and Xiao 2007), the robust optimization problem for scheduling was deﬁned as ﬁnding the minimum value V ∗ and a POS x, such that we have a prescribed probability guarantee that the realized makespan of the feasible schedule instantiated by the POS does not exceed V ∗ . In other words, computing the minimum V ∗ such that the following probability bound is guaranteed: ˜ z P (V (x, ˜) ≤ V ∗ ) ≥ 1 − ε, (6)
+
+Robust Local Search Algorithm To efﬁciently solve problem of ﬁnding the POS that minimizes the robust makespan, (Lau, Ou, and Xiao 2007) proposed to employ the above robust ﬁtness function in a traditional local search algorithm. The input to this algorithm are an RCPSP/max problem instance, mean and variance values of the segregated variables of data perturbations and the level of risk, while the output is the POS with a locally minimal robust value. In the algorithm, local search is conducted on activity lists. An activity list is considered as the sequence of all activities that satisfy the non-negative minimal and maximal time lag constraints, and it is obtained by employing a greedy heuristic. Subsequently, each activity is scheduled sequentially based on its order position in the activity list. After ﬁnding a feasible schedule, a POS will be generated by applying the chaining procedure proposed by (Policella et al. 2004). Finally, each POS is evaluated by obtaining its ﬁtness value, and the solution with the lowest robust objective value is the best solution. The key to the local search is the local moves between activity lists in the space of all activity lists. In this case, it is performed as follows: When the activity list results in an infeasible schedule, the local move will randomly push ahead the ﬁrst activity which cannot be scheduled in the current activity list. When the activity list results in a feasible schedule, the local move will randomly pick two activities and swap them in the current activity list, while satisfying the non-negative minimal time lag constraints. In order to explore more different activity lists, a probability set at 0.01 is introduced to accept the move to an activity list which leads to an infeasible schedule. Comments on Segregated Linear Rule Compared with other linear decision rules (Ben-Tal and Nemirovski 2002), the superiority of SLDR (Chen et al. 2008) lies in the ability to linearly express an upper bound on a subset of random variables by dissecting each uncertainty into its positive and negative components (see Eqn 2), which is helpful to decide the start time of each activity (and also eventually the makespan which is represented as the start time of the ﬁnal dummy activity). Unfortunately, this decision rule increases tractability and scalability at the expense of losing accuracy.
+
+˜ z where V (x, ˜) represents the actual makespan variable of a feasible schedule derived from POS x with uncertainty parameters ˜, whose value varies with respect to the decision z rule as shown above. From the one-sided Chebyshev’s Inequality, the above robust optimization problem can be reformulated as: min s.t. V∗ ˜ z E[V (x, ˜)] +
+1−ε ε
+
+General Non-linear Decision Rule
+˜ z V ar[V (x, ˜)] ≤ V ∗ . (7) As mentioned earlier, the SLDR was unable to provide tight upper bounds on robust makespan, due to the restriction on linear decision rules. In this section, we deﬁne a general non-linear decision rule(GNLDR), which not only provides tight upper bounds but is also efﬁciently computable and used effectively for local search. ˜ For clarity and comparison purposes, we use G to de˜ note the start time instead of V used by (Lau, Ou, and Xiao 2007). Given the mean and variance values of duration uncertainty, we ﬁrst provide the deﬁnition of this new decision rule, i.e., the start time representation for activities in serial or in parallel. Furthermore, we compute the robust ﬁtness value by computing the mean and variance values of the ad˜ z justable variable, G(x,˜). To compare results with the pre-
+
+Thus, the ﬁtness function to be used in the local search can be obtained as a function of the expected value and variance ˜ z of the adjustable variable (i.e.V (x, ˜)). The ﬁtness value ﬁnally returned is termed as the robust makespan. Deﬁnition 1. Given a level of risk 0 < ε ≤ 1 and the ad˜ z justable function V (x, ˜) expressed under Segregated Linear Decision Rule, the robust ﬁtness function f (x, ˜, ε) of a POS z x, is deﬁned as ˜ z f (x, ˜, ε) = E[V (x, ˜)] + z 1−ε ε ˜ z V ar[V (x, ˜)] (8)
+
+75
+
+vious method, we also investigate the speciﬁc case where duration perturbation for each activity ai is normally distributed, i.e. zi ∼ N (0, σi ). ˜
+
+Serial Activities
+In GNLDR, we represent the end time of the serial k-activity project network as the sum of all stochastic durations: ˜ z Gk (˜) =
+k i=1
+
+Proof. We begin by considering the following two equalities: max{˜1 , z2 } + min{˜1 , z2 } = z1 + z2 z ˜ z ˜ ˜ ˜ max{˜1 , z2 } − min{˜1 , z2 } = |˜1 − z2 | z ˜ z ˜ z ˜ We now sum the above two equalities. 1 ˜ z ˜ (15) (˜1 + z2 + |˜1 − z2 |), z 2 Thus, we can now compute the expected value of the maximum using the following equation. max{˜1 , z2 } = z ˜ 1 z z ˜ (E[˜1 ] + E[˜2 ] + E|˜1 − z2 |) (16) z 2 In addition, by using the deﬁnition of variance, we obtain: E[max{˜1 , z2 }] = z ˜ ˜ z ˜ z ˜ V ar|˜1 − z2 | = E(˜1 − z2 )2 − (E|˜1 − z2 |)2 ≥ 0, z Therefore, E|˜1 − z2 | ≤ z ˜ E(˜1 − z2 )2 . z ˜
+
+(d0 + zi ). ˜ i
+
+(9)
+
+Therefore, in this case, we have the same representation as the SLDR. Since {˜i }i=1,...k are random variables with zero mean, z we can then calculate the expected value as:
+k
+
+E[
+i=1
+
+(d0 + zi )] = ˜ i
+
+k i=1
+
+d0 . i
+
+(10)
+
+Because {˜i } are assumed to be independent of each other, z the variance value is computed by the following expression:
+k
+
+V ar[
+i=1
+
+(d0 + zi )] = ˜ i
+
+k
+
+V ar[˜i ], z
+i=1
+
+(11)
+
+Since expected values for data perturbation can never be negative during computation of robust ﬁtness value, we can ˜ further bound E|˜1 − z2 | as: z E|˜1 − z2 | z ˜ z z z z ≤ V ar[˜1 ] + V ar[˜2 ] + E(˜1 )2 + E(˜2 )2 . Substituting this expression into Eqn 16 yields the bound E[max{˜1 , z2 }] z ˜ z z ≤ 1 (E[˜1 ] + E[˜2 ])+ 2 1 V ar[˜1 ] + V ar[˜2 ] + (E[˜1 ])2 + (E[˜2 ])2 . z z z z 2 (17) Hence the proof. In the special case where {˜i } (i = 1, ...k) are normally z and identically distributed, i.e. zi ∼ N (0, σ), we know from ˜ (E.Clark 1961) that there is a closed form representation for the expected value of the maximum when k = 2 and k = 3, respectively: σ E[max{˜1 , z2 }] = √ z ˜ π 3σ E[max{˜1 , z2 , z3 }] = √ z ˜ ˜ 2π Now we focus on deriving expressions for variance of the maximum of two general distributions, i.e., V ar[max(˜1 , z2 )]. z ˜ Proposition 2. Variance for the maximum of two general distributions, z1 and z2 is less than ˜ ˜ z z z V ar(˜1 ) + V ar(˜2 ) + 1 (E(˜1 ))2 + 1 (E(˜2 ))2 z 2 2 Proof. From Eqn 15, we have V ar[max(˜1 , z2 )] z ˜ = 1 V ar[˜1 + z2 + |˜1 − z2 |] z ˜ z ˜ 4 ≤ 1 (V ar[˜1 + z2 ] + V ar|˜1 − z2 |). z ˜ z ˜ 2 Firstly, we consider the following two equations. ˜ z ˜ z ˜ V ar|˜1 − z2 | = E(˜1 − z2 )2 − (E|˜1 − z2 |)2 z V ar(˜1 − z2 ) = E(˜1 − z2 )2 − (E(˜1 − z2 ))2 z ˜ z ˜ z ˜ (18)
+
+and under normal distribution where zi ∼ N (0, σi ), we have ˜
+k
+
+V ar[
+i=1
+
+(d0 + zi )] = ˜ i
+
+k i=1
+
+2 σi .
+
+(12)
+
+Note that the expressions for expected value and variance in the case of serial activities are identical to the ones used in (Wu., Brown., and Beck 2009).
+
+Parallel Activities
+In the parallel case, for ease of explanation, we begin by considering two activities to be executed in parallel and then extend the analysis to multiple parallel activities. Two Parallel Activities The new decision rule to represent the starting time of an activity, which will begin after the completion of two parallel activities is deﬁned as: ˜ z z ˜ G2 (˜) ≤ max{d0 , d0 } + max{˜1 , z2 }. 1 2 (13) Note that we tighten the bound in Eqn ?? by replacing z1 + ˜+ + z2 with max{˜1 , z2 }. ˜ z ˜ Towards computing the robust ﬁtness value, we now derive the expressions for expected value and variance of the adjustable variable, i.e., the RHS term of Eqn 13 in this case. Firstly, for the expected value: z ˜ E[max{d0 , d0 } + max{˜1 , z2 }] 1 2 = max{d0 , d0 } + E[max{˜1 , z2 }]. z ˜ 1 2 (14)
+
+In the general case, it is difﬁcult to derive an exact expression for E[max{˜1 , z2 }] and hence, we provide an upper z ˜ bound. Proposition 1. Expected value for the maximum of two general distributions, z1 and z2 is less than ˜ p ˜
+1 (E[˜1 ]+E[˜2 ])+ 1 z z 2 2
+
+V ar[˜1 ] + V ar[˜2 ] + (E[˜1 ])2 + (E[˜2 ])2 z z z z
+
+76
+
+Subtracting the second from the ﬁrst yields V ar|˜1 − z2 | z ˜ = V ar(˜1 − z2 ) + (E(˜1 − z2 ))2 − (E|˜1 − z2 |)2 . z ˜ z ˜ z ˜ Now, we substitute this expression into the third term of Eqn 18 to obtain: V ar[max(˜1 , z2 )] z ˜ z ≤ V ar(˜1 ) + V ar(˜2 )+ z 1 z z 2 1 z ˜ 2 2 (E(˜1 ) − E(˜2 )) − 2 (E|˜1 − z2 |) . (19) When no speciﬁc distribution about duration perturbation is known, we can obtain a bound for V ar[max(˜1 , z2 )] as: z ˜ V ar[max(˜1 , z2 )] z ˜ z z z ≤ V ar(˜1 ) + V ar(˜2 ) + 1 (E(˜1 ))2 + 1 (E(˜2 ))2 . z 2 2 (20) Hence the proof. It is interesting to consider the special case when both random variables are normally distributed. We ﬁrst state the following lemma1 . Lemma 0. If X is normally distributed X ∼ N (0, σ), then .1. Y = |X| is half-normally distributed, with 2 . (21) π Under normal distribution zi ∼ N (0, σi ), since z1 − z2 ˜ ˜ ˜ is also normally distributed, and z1 − z2 ∼ N (0, σ1 + σ2 ), ˜ ˜ ˜ we can conclude from Lemma 0. that |˜1 − z2 | follows half.1 z normal distribution with E(Y ) = σ 2 . (22) π Thus, if we substitute this expression into Eqn 19, we can express an upper bound on the variance value for the maximum duration perturbation of two activities, when zi ∼ N (0, σi ) ˜ as : 1 2 2 2 V ar[max(˜1 , z2 )] ≤ (1 − )(σ1 + σ2 ) − σ1 σ2 . (23) z ˜ π π Multiple Parallel Activities Extending from two to k (k > 2) parallel activities, the completion time can be upper bounded by: ˜ z Gk (˜) ≤ max {d0 } + max {˜i } z (24) E|˜1 − z2 | = (σ1 + σ2 ) z ˜
+i=1,...k i i=1,...k
+
+(a) Firstly, we group the activity set {a1 , ..., ak } into a couple set {C1 , ..., C k }, where each element Cj (j = 1, ... k ) 2 2 contains two different activities Cj = {aj1 , aj2 } chosen from the activity set. Note that when k is an odd, the ﬁnal element in the couple set contains just one activity. (b) For each couple Cj , we apply the maximum operator on duration perturbations of involving activities. Denote cj = ˜ ˜ ˜ max{˜j1 , zj2 }, where zj1 and zj2 are duration perturbations z ˜ c of the two activities involved in Cj , then V ar(˜j ) can be calculated based on the expression for the two-parallel-activity case. z max {˜j }. (Note c (c) Then we have max {˜i } =
+i=1,...k j=1,...
+
+again just one activity is contained in C k when k is odd). 2 Then, we can build another couple set from {C1 , ..., C k }, 2 and the same method from steps (1) and (2) above is used c to compute V ar[ max {˜j }] based on Eqn 20 and/or
+j=1,...
+k 2
+
+k 2
+
+Eqn 23. To generate the couple set {C1 , ..., C
+k(k−1) 2
+
+k 2
+
+} for k activities
+
+different ways of grouping the in parallel, we have activities. Each of these groupings can lead to different levels of tightness of derived robust makespan. The problem to ﬁnd the grouping technique which provides the best robust ﬁtness value is an open question. Instead, we are trying to provide a good grouping technique under normal distribution zi ∼ N (0, σi ) by solving the following optimization ˜ problem: max
+t j=1,...
+k 2
+
+σj1 σj2
+
+(26)
+
+where t denotes the grouping technique and is also the decision variable; the size of solution space is k(k−1) ; {Cj } is 2 the couple set constructed from the activity set under grouping method t; σj1 and σj2 are the standard deviations of data perturbation for durations of activities contained in Cj . Proposition 3. The solution t∗ to the optimization problem of Eqn 26 is obtained by ordering the k activities in a nonincreasing order of their variance values and then grouping all two nearest activities according to the order, i.e. Cj = {aj1 , aj2 }, where j = 1, ... k and the standard deviations 2 are in the following order: σ11 ≥ σ12 ≥ σ21 ≥ σ22 ≥, ...σ
+k 2
+
+In the following, we ﬁrst compute the variance value of the above RHS term and then use a similar procedure to compute the expected value. The basic expression for variance of RHS is: z V ar[ max {d0 } + max {˜i }] i i=1,...k i=1,...k (25) = V ar[ max {˜i }] z
+i=1,...k
+
+1
+
+≥σ
+
+k 2
+
+2.
+
+(27)
+
+z To obtain the value of V ar[ max {˜i }] for general probi=1,...k
+
+Proof. Suppose we have another grouping method t , in which all elements in the couple set are the same as under t∗ except two couples 2 where the ordering is different, i.e., Cm = {am1 , an2 } and Cn = {am2 , an1 } (m = n), where Cm = {am1 , am2 } and Cn = {an1 , an2 } under t∗ . Without loss of generality, assume m > n and from Eqn 27, we have σm1 ≥ σm2 ≥ σn1 ≥ σn2 . (28)
+
+ability distributions, we take advantage of the analysis provided for the two-parallel-activity case above. The following steps outline the overall idea:
+1 This can be found in statistics texts, and found online at http://en.wikipedia.org/wiki/Half-normal distribution
+
+2 It should be noted that if there is an ordering change in only one couple, then the method still produces the same solution because within a couple the variance computation does not consider the order.
+
+77
+
+Since t is supposed to provide a solution which is no less ( deﬁned in Eqn 26) than t∗ , i.e. σ11 σ12 + ... + σm1 σn2 + ... + σn1 σm2 + ... + σ k 1 σ k 2 2 2 ≥ σ11 σ12 + ... + σm1 σm2 + ... + σn1 σn2 + ... + σ k 1 σ k 2 . 2 2 Therefore, we have σm1 σn2 + σn1 σm2 ≥ σm1 σm2 + σn1 σn2 , which is equivalent to: (σm1 − σn1 )(σn2 − σm2 ) ≥ 0. This contradicts Eqn 28 (except the case where all standard deviations are equal, in which case mixing the order does not affect anything). Thus, there exists no such t which is different from t∗ by at least two couples and has better objective value. The general case that t has multiple (more than two) couples different from t∗ can be easily derived from to this case (and is omitted due to space constraints). Hence the proof. As for analyzing the expected value E[ max {˜i }], we z
+i=1,...k
+
+Algorithm Design
+To search for better schedules, we provide a minor modiﬁcation to local search algorithm provided by Lau et al. (Lau, Ou, and Xiao 2007). Given the RCPSP/max problem instance, mean and variance values of duration perturbations, level of risk prescribed by the planner, this algorithm will also return the POS with the minimal robust makespan G∗ . We perform local search on the neighborhood set of activity lists and apply the same heuristic to generate the initial solution as in (Lau, Ou, and Xiao 2007). Where we depart from that work in our algorithm is that we design a ﬁtnessbased neighborhood generation mechanism, rather than randomly picking the activity list from a randomly generated neighborhood. The idea is, that for the current activity list, ﬁve candidate neighbors will be generated randomly and local move will pick the one which results in a POS with the best objective value. To explore different activity lists, we set a higher probability 0.8 to move from an activity list which results in a feasible schedule to one which lead to an infeasible schedule.
+
+apply the same procedure employed to calculate the variance, i.e., based on the group solution returned by the above optimization problem, we ﬁrst calculate the expected value for each couple and then, get the ﬁnal bound following Eqn 17.
+
+Experimental Evaluation
+We tested on 3 benchmark sets for RCPSP/max: J10, J20 and J30 as speciﬁed in the PSPLib (Kolisch, Schwindt, and Sprecher 1998). Each set contains 270 problem instances (denoted from PSP1 to PSP270) with duration range for each activity as [1,10]. The maximum number of activities for J10, J20, J30 are 10, 20, 30, respectively. For each benchmark set, we record the average results over the solved problem instances included in that set. Our code was implemented in C++ and executed on a Core(TM)2 Duo CPU 2.33GHz processor under FedoraCore 11 (Kernel Linux 2.6.29.4-167.fc11.i586) with a main memory of 1004MB. For each activity ai , we set the expected value d0 of i the stochastic duration as the corresponding deterministic duration given by the benchmarks, and assume that duration uncertainty is normally distributed, i.e. zi ∼ N (0, σ). ˜ We run our algorithm across 5 different duration variabilities σ = {0.1, 0.5, 1, 1.5, 2} and 4 increasing levels of risk ε = {0.01, 0.05, 0.1, 0.2} with the maximal number of iterations for local search set to 1000. To reduce the possible effect of random factors during the search process on ﬁnal results, we average over 10 random executions for each problem instance.
+
+Extended Robust Local Search
+In this section, we derive a new ﬁtness function under our proposed GNLDR, and present how the ﬁtness function can used to guide the local search towards ﬁnding robust execution strategies (POS).
+
+Fitness Function under General Non-linear Rule
+Under GNLDR, we know how the actual start times of the activities are to be set with respect to dynamic realizations of uncertainty and a POS. The makespan for the POS, which is also the start time of the ﬁnal dummy activity a variable, can as well be constructed(or upper bounded). Moreover, the mean and variance values of the makespan (or its upper bound) can be obtained in terms of given mean and variance values of duration perturbation, according to different ways of connection between activities analyzed above. Given a 0 < ε ≤ 1, our goal is to ﬁnd the minimum robust makespan G∗ and a policy (i.e. POS) such that we have 1 − ε probability guarantee that the actual realized makespan instantiated by the policy does not exceed G∗ . Based on the similar analysis in (Lau, Ou, and Xiao 2007), we can also derive the robust ﬁtness function under our proposed non-linear decision rule which will be used to guide the local search towards robust strategies: Deﬁnition 2. Given a level of risk 0 < ε ≤ 1 and ˜ z the adjustable function G(x, ˜) expressed under General Non-linear Decision Rule, the robust ﬁtness function g(x, ˜, ε) of a POS x, is deﬁned as z ˜ z g(x, ˜, ε) = E[G(x, ˜)] + z 1−ε ε ˜ z V ar[G(x, ˜)] (29)
+
+Factors affecting G∗
+We ﬁrst present the results of applying our local search guided by our proposed GNLDR, and study how the robust makespan is affected by the level of risk ε and the standard deviation σ of duration uncertainty. This subsection also illustrates that our new algorithm retains the desirable properties of the algorithm by (Lau, Ou, and Xiao 2007). The algorithm will return an execution strategy (denoted as P OSG∗ ) with the robust makespan G∗ . We observe that J30 has the same trend as for J10 and J20, thus missing due to space constraints. Figure 1 gives the results for variation in duration standard deviation and level of risk for J10 and J20. We
+
+78
+
+(a) Results of J10
+
+(b) Results of J20
+
+Figure 1: G∗ over different values of σ and ε. observe that: (a) As the level of risk ε increases, the robust makespan G∗ decreases. Clearly, the lower risk that the planner is willing to take, the higher robust value of the generated execution strategy, and our method is capable of quantifying the tradeoff, which can help the planner to decide on the desired strategies. Thus, the customer-oriented property of the approach of (Lau, Ou, and Xiao 2007) is retained in our method. (b) As the degree of duration variability σ increases, the robust makespan G∗ increases, and the value becomes more sensitive to σ when the level of risk is constrained to be to a small value (e.g. ε = 0.01).
+
+to obtain insights on and compare the distributions of the actual makespans of schedules derived using these methods. For this purpose, we generate a set of 100 samples of realizations of durational uncertainty and test with all 270 instances of each benchmark set with different levels of risk ε = 0.2, ε = 0.1 and ε = 0.05 to obtain the respective POS, and then compute the actual makespans of schedules derived from the respective POS under the given realization samples. This difference was observed across the board in all examples of the three sets for all values of ε except 0.01. Due to the same trend, we randomly selected three problem instances from the each benchmark set and summary the results in Figure 3. Figure 3 also compares the cumulative frequency distributions of the actual makespans. We observe that our method provided far better realized makespans - both in absolute terms, as well as distributionally.
+
+(a) Results of PSP50 from J10 under ε = 0.2
+
+(b) Results of PSP45 from J20 under ε = 0.1
+∗ Figure 2: Comparison of G∗ and VP OSG∗ under σ = 1.5.
+
+G∗ -guided Local Search vs V ∗ -guided Local Search
+In our next experiment, we compare G∗ and V ∗ corresponding to P OSG∗ . This is to check whether the new robust ﬁtness value provided by the new decision rule provides tighter bounds on robust makespan values. As can be noted from Figure 2, except for very small values of ε (= 0.01), our new decision rule is able to provide better robust makespan values. For very small values of epsilon, the robust makespan value provided by SLDR is better. However, for slightly higher values of ε (from 0.05), G∗ dominates and the range of domination increases for higher values of ε. Next, in Figure 3, we compare the quality of the execution strategies obtained by our scheme, against those produced by the search method guided by the ﬁtness evaluation function V ∗ (Lau, Ou, and Xiao 2007). More precisely, we wish
+
+(c) Results of PSP45 from J30 under ε = 0.05
+
+Figure 3: Comparison of Actual Makespans.
+
+Related Work
+In scheduling with duration uncertainty, one key approach is to execute a baseline schedule that is buffered against uncer-
+
+79
+
+tainty (Aytug et al. 2005). However, baseline schedules may become brittle in face of unpredictable execution dynamics and can quickly get invalidated. On the other hand, Partial Order Schedules (POS) deﬁned in (Policella et al. 2004) can retain temporal ﬂexibility whenever the problem constraints allow it and can often absorb unexpected deviation from predictive assumptions. In (Rasconi., Cesta., and Policella 2010), different methods of generating POS are compared in terms of robustness, ﬂexibility and ﬂuidity of the resulting schedules. For a good survey of works on project scheduling under uncertainty, one may refer to (Herroelen and Leus 2005). As for the Job Shop Scheduling Problems, a recent work in (Rodr´guez et al. 2009) modeled uncertain durations as ı fuzzy numbers and improved local search methods to solve the problem. Robust Optimization has been an active topic in Operations Research. (Chen et al. 2008) proposed tractable decision rule models to solve linear stochastic optimization problems. To overcome the inherent computational challenge of this decision rule model in solving large-scale problems, (Lau, Ou, and Xiao 2007) integrated robust optimization techniques into local search and proposed Robust Local Search framework. This framework was then extended with additional consideration of unexpected resource breakdowns in (Fu, Lau, and Xiao 2008), so that POS can absorb both resource and duration uncertainty.
+
+Conclusion
+Given a level of risk 0 < ε ≤ 1 chosen by the planner, we concerned with the problem of ﬁnding the minimum (1−ε)guaranteed makespan (i.e. Robust Makespan) and a policy (i.e. POS) such that when uncertainty is dynamically realized, the execution policy will result in a solution whose value is as good as robust makespan. We ﬁrst put forward a new decision rule utilized in scheduling to help specify the start times for all activities with respect to execution policy and dynamic realizations of data uncertainty. Based on the decision rule, new ﬁtness function was then derived to evaluate robustness, which was ﬁnally integrated into a local search framework to produce the solution with robust makespan. Experimental results illustrate the improved performance of local search with the new ﬁtness evaluation, which provider tighter bounds on robust makespan and better partial order schedules compared to the existing method.
+
+References
+Aytug, H.; Lawley, M. A.; McKay, K.; Mohan, S.; and Uzsoy, R. 2005. Executing production schedules in the face of uncertainties: A review and some future directions. In European Journal of Operational Research, volume 165(1), 86–110. Bartusch, M.; Mohring, R. H.; and Radermacher, F. J. 1988. Scheduling project networks with resource constraints and time windows. Ann. Oper. Res. 16(1-4):201– 240. Beck, J. C., and Wilson, N. 2007. Proactive algorithms for
+
+job shop scheduling with probabilistic durations. J. Artif. Int. Res. 28(1):183–232. Ben-Tal, A., and Nemirovski, A. 2002. Robust optimization - methodology and applications. Math. Prog. Series B 92:453–480. Chen, X.; Sim, M.; Sun, P.; and Zhang, J. 2008. A linear decision-based approximation approach to stochastic programming. Oper. Res. 56(2):344–357. Dean, B. C.; Goemans, M. X.; and Vondr´ k, J. 2004. Apa proximating the stochastic knapsack problem: The beneﬁt of adaptivity. In FOCS, 208–217. Dechter, R.; Meiri, I.; and Pearl, J. 1991. Temporal constraint networks. Artif. Intell. 49(1-3):61–95. Demeulemeester., E. L., and Herroelen., W. S. 2002. Project scheduling : a research handbook. Kluwer Academic Publishers, Boston. E.Clark, C. 1961. The greatest of a ﬁnite set of random variables. Oper. Res. 9(2):145–162. Fu, N.; Lau, H. C.; and Xiao, F. 2008. Generating robust schedules subject to resource and duration uncertainties. In ICAPS, 83–90. Hagstrom., J. N. 1988. Computational complexity of pert problems. Networks 18:139–147. Herroelen, W., and Leus, R. 2005. Project scheduling under uncertainty: Survey and research potentials. In European Journal of Operational Research, volume 165(2), 289–306. Kolisch, R.; Schwindt, C.; and Sprecher, A. 1998. Benchmark Instances for Project Scheduling Problems. Kluwer Academic Publishers, Boston. 197–212. Lau, H. C.; Ou, T.; and Xiao, F. 2007. Robust local search and its application to generating robust schedules. In ICAPS, 208–215. M¨ hring, R. H. 2001. Scheduling under uncertainty: o Bounding the makespan distribution. In Computational Discrete Mathematics, 79–97. Policella, N.; Smith, S. F.; Cesta, A.; and Oddi, A. 2004. Generating robust schedules through temporal ﬂexibility. In International Conf. on Automated Planning and Scheduling (ICAPS), 209–218. Rasconi., R.; Cesta., A.; and Policella, N. 2010. Validating scheduling approaches against executional uncertainty. Journal of Intelligent Manufacturing 21(1):49–64. Rodr´guez, I. G.; Vela, C. R.; Puente, J.; and Hern´ ndezı a Arauzo, A. 2009. Improved local search for job shop scheduling with uncertain durations. In ICAPS. Vonder, S.; Demeulemeester, E.; and Herroelen, W. 2007. A classiﬁcation of predictive-reactive project scheduling procedures. J. of Scheduling 10(3):195–207. Wu., C. W.; Brown., K. N.; and Beck, J. C. 2009. Scheduling with uncertain durations: Modeling - robust scheduling with constraints. Computers and Operations Research 36:2348–2356.
+
+80
+
+

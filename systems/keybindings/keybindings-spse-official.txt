@@ -1,0 +1,159 @@
+M-:		$self->MyGUI->Eval();
+C-v		$self->MyGUI->GetCurrentTab->ScrollDown(); # motivation is that
+M-v		$self->MyGUI->GetCurrentTab->ScrollUp();
+C-x >		$self->MyGUI->GetCurrentTab->ScrollRight();
+C-x <		$self->MyGUI->GetCurrentTab->ScrollLeft();
+# C-}		$self->MyGUI->GetCurrentTab->MoveToNextNodeGroup();
+# C-{		$self->MyGUI->GetCurrentTab->MoveToPreviousNodeGroup();
+C-x }		$self->MyGUI->GetCurrentTab->ZoomIn();
+C-x {		$self->MyGUI->GetCurrentTab->ZoomOut();
+C-n		$self->MyGUI->GetCurrentTab->MoveToNextNodeVertical();
+C-p		$self->MyGUI->GetCurrentTab->MoveToPreviousNodeVertical();
+C-f		$self->MyGUI->GetCurrentTab->MoveToNextNodeHorizontal();
+C-b		$self->MyGUI->GetCurrentTab->MoveToPreviousNodeHorizontal();
+# C-x C-b		$self->MyGUI->ListContexts();
+# C-x b		$self->MyGUI->SwitchContext();
+C-x C-f		$self->MyGUI->OpenContext(CurrentTab => 1);
+C-c C-t		$self->MyGUI->OpenContext(NewTab => 1); # Jump to the next tab
+C-x k		$self->MyGUI->KillContext();
+C-c C-n		$self->MyGUI->NextContext(); # Jump to the next tab
+C-c C-p		$self->MyGUI->PreviousContext(); # Jump to the previous tab
+# C-x C-w		$self->MyGUI->ExportContext();
+# C-w		$self->MyGUI->GetCurrentTab->KillRegion();
+# C-y		$self->MyGUI->GetCurrentTab->Yank();
+# C-k		$self->MyGUI->GetCurrentTab->Kill();
+# # C-s		$self->MyGUI->GetCurrentTab->Select(Selection => "By Search");
+C-s		$self->MyGUI->GetCurrentTab->Find();
+C-x h 		$self->MyGUI->GetCurrentTab->Select(Selection => "All");
+C- 		$self->MyGUI->GetCurrentTab->Select(Selection => "None");
+C-l		$self->MyGUI->GetCurrentTab->Recenter();
+# C-x o		$self->MyGUI->OtherWindow();
+C-x C-c		NonEval:Exit
+C-c n +		$self->MyGUI->GetCurrentTab->FindOrCreateNode();
+C-c e g n		$self->MyGUI->GetCurrentTab->EditPointNode();
+C-c e g c		$self->MyGUI->GetCurrentTab->EditPointNode(Attribute => 'Financial Constraints');
+C-c e g f		$self->MyGUI->GetCurrentTab->EditPointNode(Attribute => 'Computational Semantics');
+C-c e g p		$self->MyGUI->GetCurrentTab->EditPointNode(Attribute => 'Project');
+C-c e g d		$self->MyGUI->GetCurrentTab->EditPointNode(Attribute => 'Description');
+C-c e g t		$self->MyGUI->GetCurrentTab->EditPointNode(Attribute => 'Temporal Constraints');
+C-c e g s		$self->MyGUI->GetCurrentTab->EditPointNode(Attribute => 'Severity');
+# C-c e g c		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Control->EditPointNode(Attribute => 'Financial Constraints');
+# C-c e g f		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Control->EditPointNode(Attribute => 'Computational Semantics');
+# C-c e g p		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Control->EditPointNode(Attribute => 'Project');
+# C-c e g d		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Control->EditPointNode(Attribute => 'Description');
+# C-c e g t		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Control->EditPointNode(Attribute => 'Temporal Constraints');
+# C-c e g s		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Control->EditPointNode(Attribute => 'Severity');
+C-h b		$self->MyGUI->DescribeBindings();
+C-h k		$self->MyGUI->DescribeKey();
+C-h l		$self->MyGUI->ViewLossage();
+C-h t		$self->MyGUI->Tutorial();
+C-h w		$self->MyGUI->WhereIs();
+M-| 		$self->MyGUI->GetCurrentTab->RunCommandOnRegion();
+C-k		$self->MyGUI->GetCurrentTab->RemoveSelectedNodes();
+C-x n n		$self->MyGUI->GetCurrentTab->NarrowToRegion();
+C-x n w		$self->MyGUI->GetCurrentTab->Widen();
+# C-c s a		$self->MyGUI->GetCurrentTab->AssertPredicate();
+M-<		$self->MyGUI->GetCurrentTab->BeginningOfContextVertical();
+M->		$self->MyGUI->GetCurrentTab->EndOfContextVertical();
+C-a		$self->MyGUI->GetCurrentTab->BeginningOfContextHorizontal();
+C-e		$self->MyGUI->GetCurrentTab->EndOfContextHorizontal();
+C-x 1		$self->MyGUI->MaximizeWindow();
+C-x 0		$self->MyGUI->UnmaximizeWindow();
+# C-c C-p		$self->MyGUI->GetCurrentTab->Generate();
+# M-:		$self->MyGUI->Eval();
+
+C-c C-k C-v g e		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{'Planning'}->Control->ActionGeneratePlan(Method => 'Selected');
+
+C-c a a		$self->MyGUI->GetCurrentTab->MyDomainManager->MyDomains->Contents->{Planning}->Model->AdjustOverdueGoals();
+C-c s b d	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Depends on", Value => "True");
+C-c s b D	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Precondition for", Value => "True");
+C-c s B d	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Depends on", Value => "Independent");
+C-c s B D	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Precondition for", Value => "Independent");
+C-c s b p	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Provides", Value => "True");
+C-c s b P	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Provided by", Value => "True");
+C-c s B p	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Provides", Value => "Independent");
+C-c s B P	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Provided by", Value => "Independent");
+C-c s b e	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Eases", Value => "True");
+C-c s b E	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Eased by", Value => "True");
+C-c s B e	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Eases", Value => "Independent");
+C-c s B E	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Eased by", Value => "Independent");
+C-c s b f	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Prefer", Value => "True");
+C-c s b F	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Deferred to", Value => "True");
+C-c s B f	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Prefer", Value => "Independent");
+C-c s B F	$self->MyGUI->GetCurrentTab->ModifyBinaryRelation(Relation => "Deferred to", Value => "Independent");
+
+C-c s u c	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Completed", Value => "True");
+C-c s U c	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Completed", Value => "Independent");
+C-c s u s	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Showstopper", Value => "True");
+C-c s U s	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Showstopper", Value => "Independent");
+C-c s u d	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Deleted", Value => "True");
+C-c s U d	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Deleted", Value => "Independent");
+C-c s u l	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Cancelled", Value => "True");
+C-c s U l	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Cancelled", Value => "Independent");
+C-c s u i	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Ridiculous", Value => "True");
+C-c s U i	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Ridiculous", Value => "Independent");
+C-c s u o	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Obsoleted", Value => "True");
+C-c s U o	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Obsoleted", Value => "Independent");
+C-c s u r	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Rejected", Value => "True");
+C-c s U r	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Rejected", Value => "Independent");
+C-c s u p	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Skipped", Value => "True");
+C-c s U p	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "Skipped", Value => "Independent");
+
+C-c s u S	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "ShoppingList", Value => "True");
+C-c s U S	$self->MyGUI->GetCurrentTab->ModifyUnaryRelation(Predicate => "ShoppingList", Value => "Independent");
+
+# C-c r r		Have a section here for jumping to a particular context rapidly, requires completion of completing-read
+
+# C-c v p p		Generate a basic plan for the entire system
+# C-c v p c		Generate a plan for the particular context
+
+# # completed showstopper deleted cancelled ridiculous obsoleted rejected skipped
+# # c s d l r o j p
+
+# # depends provides eases prefer
+# # d p e f
+
+# # hide all goals of less than a given severity level
+# # Mark Goal Habitual
+# # select all completed goals, etc
+
+# # get the number of selected nodes
+
+# # flag objection for selected nodes
+
+# # push selection onto selection ring
+
+# # 		SelectAllNodesConnectedToRegion
+# # 		SelectAllNodesConnectedToFromRegion
+# # 		SelectAllNodesConnectedIntoRegion
+
+# # 		SelectChildNodeOfSelection
+
+# # 		SelectAllSiblings
+
+# # 		SelectInverseOfSelection
+
+# # 		MarkAllSelected
+
+# # 		HideMarkedNodes
+
+# # 		SelectByRegex
+# # 		SelectByEntailment
+
+# # 		ConsiderRelation
+
+# # 		SelectContainingProject
+
+# # 		CreateChildNode
+
+# # 		EditNode
+# # 		EditNodeFormalization
+# # 		EditNodeProject
+# # 		EditNodeText
+# # 		EditNodeTemporalConstraints
+# # 		EditNodeDescription
+# # # functions to add
+# # SelectContainingProject
+# # CreateNewNode
+# # CreateNewDependentNode
+# # Help

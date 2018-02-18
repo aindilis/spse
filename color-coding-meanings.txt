@@ -1,0 +1,31 @@
+Relations
+	Binary
+		Depends
+			Color: Red
+			Analogy: Stop Sign/Stop Light
+			Reason: Dependencies imply Stop, that the one cannot be fully completed without the depdency
+		Eases
+			Color: Gold
+			Analogy: Money
+			Reason: Money eases things too
+		Provides
+			Color: Green
+			Analogy: Green Light
+			Reason: Provides essentially means that if one goal is done, the goal which it provides is done
+		Prefers
+			Color: Purple
+			Analogy: Nobility
+			Reason: Purple is the color of Nobility in Ireland, preference was usually given them
+	Unary
+		Completed
+			Color: Blue
+			Analogy: Water?
+			Reason: Blue can mean peaceful, and that is what it means - that it is at peace or has been completed.
+		Rejected/Skipped/etc
+			Color: Brown
+			Analogy: Waste Material
+			Reason: These are items that are being ignored, so they are waste items.
+		ShowStopper
+			Color: Red
+			Analogy: Stop Sign/Stop Light
+			Reason: It is a show stopper, hence the stopping

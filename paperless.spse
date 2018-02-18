@@ -1,0 +1,7 @@
+("asserter" ("entry-fn" "pse" "1") "unknown")
+("goal" ("entry-fn" "pse" "1"))
+("has-NL" ("entry-fn" "pse" "1") "Scan Documents")
+("asserter" ("entry-fn" "pse" "2") "unknown")
+("goal" ("entry-fn" "pse" "2"))
+("has-NL" ("entry-fn" "pse" "2") "Organize Scanning Queue")
+("depends" ("entry-fn" "pse" "1") ("entry-fn" "pse" "2"))

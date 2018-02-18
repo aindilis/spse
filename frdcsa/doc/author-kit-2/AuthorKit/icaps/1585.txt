@@ -1,0 +1,18 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+From Automated Veriﬁcation to Automated Design (Invited Talk Abstract)
+
+Moshe Y. Vardi
+Department of Computer Science Rice University Houston, TX 77251-1892, USA vardi@cs.rice.edu
+
+One of the most signiﬁcant developments in the area of design veriﬁcation over the last decade is the development of of algorithmic methods for verifying temporal speciﬁcation of ﬁnite-state designs (Clarke, Grumberg, and Peled 1999). A frequent criticism against this approach, however, is that veriﬁcation is done after signiﬁcant resources have already been invested in the development of the design. Since designs invariably contains errors, veriﬁcation simply becomes part of the debugging process. The critics argue that the desired goal ought to be the use of the speciﬁcation in the design development process in order to guarantee the development of correct designs. This is called design synthesis (Church 1957; Pnueli and Rosner 1989). In this talk I will review 50 years of research on the design-synthesis problem and show how the automata-theoretic approach can be used to solve it (Kupferman and Vardi 2005; Pnueli and Rosner 1989; Rabin 1972).
+
+References
+A. Church. Applicaton of recursive arithmetics to the problem of circuit synthesis. In Summaries of Talks Presented at The Summer Institute for Symbolic Logic, pages 3–50. Communications Research Division, Institute for Defense Analysis, 1957. E. M. Clarke, O. Grumberg, and D. Peled. Model Checking. MIT Press, 1999. O. Kupferman and M. Y. Vardi. Safraless Decision Procedures. In Proc. 46th IEEE Symp. on Foundations of Computer Science, pages 531–540, 2005. A. Pnueli and R. Rosner. On the synthesis of a reactive module. In Proc. 16th ACM Symp. on Principles of Programming Languages, pages 179–190, 1989.
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+M.O. Rabin. Automata on inﬁnite objects and Church’s problem. Amer. Mathematical Society, 1972.
+
+271
+
+

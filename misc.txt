@@ -1,0 +1,24 @@
+use X11::WMCtrl;
+
+sub Maximize {
+  my ($self,%args) = @_;  
+  my $wmctrl = X11::WMCtrl->new;
+  my @matches;
+  foreach my $window ($wmctrl->get_windows) {
+    print $window->{title}."\n";
+    if ($window->{title} =~ /Shared Priority System Editor 2/) {
+      push @matches, $window;
+    }
+  }
+  # for now just do this
+  my $app = $matches[0]->{id};
+  # print Dumper({App => $app});
+  ApproveCommands
+    (
+     Commands => [
+		  "wmctrl -i -r $app -b add,maximize",
+		 ],
+     Method => "parallel",
+     AutoApprove => 1,
+    );
+}

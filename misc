@@ -1,0 +1,113 @@
+sub LoadMenusOld {
+  my ($self,%args) = @_;
+  $self->MyMenu->{Node}->add('command', -label => 'Dismiss Menu', -command => sub {});
+  $self->MyMenu->{Node}->add
+    (
+     'command',
+     -label => 'Mark Task as Complete',
+     -command => sub {
+       my %args = @{$self->LastTags};
+       my $node = $args{node};
+       if ($node =~ /^node(\d+)$/) {
+         my $id = $1;
+         $self->MyGraphViz->{NODES}->{$id}->{fillcolor} = "blue";
+         my $ref = ref $self->MyTkGraphViz->{Scrolled};
+         print Dumper(Class::ISA::super_path($ref));
+         $self->RestoreZoom();
+       }
+     },
+    );
+
+  $self->MyMenu->{Node}->add
+    (
+     'command',
+     -label => 'Cancel Task',
+     -command => sub {
+       # we need to remove this task from the goal list - get the task
+       # information, and then be prepared to remove it
+     },
+    );
+  $self->MyMenu->{Node}->add
+    (
+     'command',
+     -label => 'Hide Node',
+     -command => sub {
+       # stop showing this node
+     },
+    );
+  $self->MyMenu->{Node}->add
+    (
+     'command',
+     -label => 'Similarity Search',
+     -command => sub {},
+    );
+  $self->MyMenu->{Node}->add
+    (
+     'command',
+     -label => 'Explain Hold-Up or Blocking Issues',
+     -command => sub {
+       my $holdup = QueryUser("What is the holdup on this item?");
+       print Dumper($holdup);
+     },
+  }
+
+
+  $self->MyMenu->{Node}->add
+    (
+     'command',
+     -label => 'Add Subtasks',
+     -command => sub {
+
+     },
+    );
+
+  my $taskmenu = $self->MyMenu->{Node}->cascade
+    (
+     -label => 'Task',
+     -tearoff => 0,
+    );
+
+  $taskmenu->command
+    (
+     -label => 'Edit',
+     -command => sub {
+       my %args = @{$self->LastTags};
+       my $node = $args{node};
+       if ($node =~ /^node(\d+)$/) {
+
+       }
+     },
+    );
+  
+  $taskmenu->command
+    (
+     -label => 'Dispute',
+     -command => sub {
+
+     },
+    );
+
+  
+  # create a subtask menu here
+
+  # edit all task info
+  
+  # set due date
+  # set estimated task length
+  
+  # Blank
+  
+  $self->MyMenu->{Blank}->add('command', -label => 'Dismiss Menu', -command => sub {});
+  $self->MyMenu->{Blank}->add
+    (
+     'command',
+     -label => 'Find Or Create Task',
+     -command => sub {
+       my %args = @{$self->LastTags};
+       print Dumper(\%args);
+       $self->FindOrCreateTask
+         (
+
+         );
+     },
+    );

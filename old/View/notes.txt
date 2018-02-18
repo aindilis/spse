@@ -1,0 +1,51 @@
+# different modules we were to build
+
+# the domain parser
+
+# the GUI for displaying generated PDDL domains
+
+# the GUI for walking us through plans (maybe have several different
+# types for different plan types (conformant, etc))
+
+# the system for analyzing goal information, such as immediately
+# accomplishable goals, etc
+
+# the system for suppositional reasoning with goals
+
+
+
+
+  # I guess this whole thing has to be done at once
+  # try to assert all the goals
+  #  if a given goal cannot be asserted, see if we should unasserted
+  #  either it, or any of it's negation-invariants
+  #  prompt the user for any non-monotonic changes to the KB
+  # finish asserting all goals
+
+  #  perhaps this could be accomplished by asserting in a parallel
+  #  context, testing, and then deleting the original and renaming the
+  #  parallel, or perhaps it could be accomplished with genls
+  #  contexts, i.e. assert it in a context inheriting from the changed
+  #  context and the original context
+
+  # if they cannot all be asserted, either remove all or prompt the user to restore the KB to it's initial condition
+  # if they are successfully asserted, execute all the functions
+
+  #   my $entries = $args{Entries};
+  #   foreach my $axiom (@{$self->Axioms}) {
+  #     my %sendargs =
+  #       (
+  #        Assert => [$axiom],
+  #        Context => $self->Context,
+  #        QueryAgent => 1,
+  #        InputType => "Interlingua",
+  #        Flags => {
+  # 		 AssertWithoutCheckingConsistency => $args{AssertWithoutCheckingConsistency},
+  # 		},
+  #       );
+  #     print Dumper(\%sendargs);
+  #     my $res3 = $self->MyClient->Send(%sendargs);
+  #   }
+
+  # for now, do nothing of the sort, simply assert without checking
+  # consistency - worry about it later

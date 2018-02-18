@@ -1,0 +1,121 @@
+$VAR1 = {};
+$VAR1 = [
+          [
+            'has-source',
+            [
+              'entry-fn',
+              'pse',
+              1
+            ],
+            [
+              'entry-fn',
+              'sayer-index',
+              29
+            ]
+          ],
+          [
+            'goal',
+            [
+              'entry-fn',
+              'pse',
+              1
+            ]
+          ],
+          [
+            'asserter',
+            [
+              'entry-fn',
+              'pse',
+              1
+            ],
+            'unknown'
+          ],
+          [
+            'has-NL',
+            [
+              'entry-fn',
+              'pse',
+              1
+            ],
+            'Test'
+          ]
+        ];
+$VAR1 = {
+          'Assert' => [
+                        [
+                          'has-source',
+                          [
+                            'entry-fn',
+                            'pse',
+                            1
+                          ],
+                          [
+                            'entry-fn',
+                            'sayer-index',
+                            29
+                          ]
+                        ]
+                      ],
+          'Flags' => {
+                       'AssertWithoutCheckingConsistency' => 1
+                     },
+          'InputType' => 'Interlingua',
+          'Context' => 'Org::FRDCSA::Verber::PSEx2::Do',
+          'QueryAgent' => 1
+        };
+$VAR1 = {
+          'Assert' => [
+                        [
+                          'goal',
+                          [
+                            'entry-fn',
+                            'pse',
+                            1
+                          ]
+                        ]
+                      ],
+          'Flags' => {
+                       'AssertWithoutCheckingConsistency' => 1
+                     },
+          'InputType' => 'Interlingua',
+          'Context' => 'Org::FRDCSA::Verber::PSEx2::Do',
+          'QueryAgent' => 1
+        };
+$VAR1 = {
+          'Assert' => [
+                        [
+                          'asserter',
+                          [
+                            'entry-fn',
+                            'pse',
+                            1
+                          ],
+                          'unknown'
+                        ]
+                      ],
+          'Flags' => {
+                       'AssertWithoutCheckingConsistency' => 1
+                     },
+          'InputType' => 'Interlingua',
+          'Context' => 'Org::FRDCSA::Verber::PSEx2::Do',
+          'QueryAgent' => 1
+        };
+$VAR1 = {
+          'Assert' => [
+                        [
+                          'has-NL',
+                          [
+                            'entry-fn',
+                            'pse',
+                            1
+                          ],
+                          'Test'
+                        ]
+                      ],
+          'Flags' => {
+                       'AssertWithoutCheckingConsistency' => 1
+                     },
+          'InputType' => 'Interlingua',
+          'Context' => 'Org::FRDCSA::Verber::PSEx2::Do',
+          'QueryAgent' => 1
+        };

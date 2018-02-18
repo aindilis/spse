@@ -1,0 +1,198 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+Temporal Planning with Problems Requiring Concurrency through Action Graphs and Local Search
+†
+
+Alfonso E. Gerevini† and Alessandro Saetti† and Ivan Serina‡
+Dipartimento di Ingegneria dell’Informazione, Università degli Studi di Brescia, via Branze 38, 25123 Brescia, Italy {gerevini,saetti}@ing.unibs.it ‡ Free University of Bozen – Bolzano, Via Ratisbona 16, 39042 Bressanone, Italy ivan.serina@unibz.it Abstract to temporal planning with problems requiring concurrency and is competitive with state-of-the-art planners.
+
+We present an extension of the planning framework based on action graphs and local search to deal with PDDL2.1 temporal problems requiring concurrency, while previously the approach could only solve problems admitting a sequential solution. The paper introduces a revised plan representation supporting concurrency and some new search techniques using it, which are implemented in a new version of the LPG planner. An experimental analysis indicates that the proposed approach is suitable to temporal planning with requiring concurrency and is competitive with state-of-the-art planners.
+
+Temporal Action Graph with Concurrency
+In this section, we give the necessary background and we introduce a plan representation supporting action concurrency. A temporal action graph (Gerevini, et al. 2003), abbreviated with TA-graph, for a planning problem is a directed acyclic leveled graph alternating a fact level and an action level. Like in Graphplan, fact levels contain fact nodes labeled by ground predicates, and each fact node f at a level l is associated with a no-op action node at level l representing a dummy action having f as its only precondition and effect. Each action level contains one action node labeled by the name of the domain action that it represents, and the no-op nodes corresponding to that level. The edges of the graph directly connect each action node a at a level l with the fact nodes at l representing the conditions of a (precondition nodes) and with the fact nodes at level l + 1 representing the positive effects of a (effect nodes). The initial and ﬁnal action levels contain the special nodes astart and aend representing the problem initial state and goals, respectively. A TA-graph A also contains a set CA of temporal constraints between the start/end of the actions in the (partial) plan represented by the graph (Gerevini, et al. 2003; 2003b): (i) ordering constraints generated to deal with mutually exclusive actions (if the domain actions labeling two action nodes are mutex, they are ordered according to the levels of their action nodes and the type of condition/effect involved in the interference); (ii) ordering constraints implied by the causal relations between the planned actions; (iii) temporal constraints encoding the planned action durations. CA can be speciﬁed as a Simple Temporal Problem (STP) (Dechter, et al. 1991), i.e., a set of constraints of form y − x ≤ t, where y and x are point variables and t ∈ R.2 A solution of an STP is an assignment of values to its point variables satisfying every constraint in the STP. An STP C has a solution iff the distance graph of the STP, indicated with D(C), does not contain a negative cycle (Dechter, et al. 1991). Given an STP encoding CA , a solution where every variable (vertex of D(CA )) has the shortest distance from the point variable for astart (with a “toler2 Depending on the type of action condition and effect involved in the causal/mutex relation generating an ordering constraint in CA , the inequality can be strict or non-strict. Strict inequality in an STP can be handled as shown in (Gerevini & Cristani 1997).
+
+Introduction
+Recent work on temporal planning, e.g., (Coles, et al. 2008; 2008b; Cushing, et al. 2007), has emphasized the practical and theoretical importance of addressing problems where action concurrency is necessary to ﬁnd a valid plan, and which cannot be solved by most of the current temporal planners. In this paper, we present an extension of the temporal planning framework based on action graphs and local search (Gerevini, et al. 2003) to deal with PDDL2.1 problems requiring concurrency. Previously the approach could only solve problems admitting a sequential solution (no necessary action overlapping in the plan), because of a strong assumption in the plan representation on the possible ordering of the start/end times of the durative actions in the plan. In the proposed revised approach, each domain action a is represented by a pair of instantaneous snap actions, distinguishing the start and end of a, which are denoted by s(a) and e(a), respectively, and by appropriate temporal constraints between the corresponding time points. The preconditions of s(a) are the start and overall conditions of a, while its effects are the start effects of a. The preconditions of e(a) are the end conditions of a, while its effects are the end effects of a.1 Essentially, a plan is represented by an action graph modeling the causal/logical relations of the snap actions and a set of temporal constraints between the start/end times of the corresponding domain actions. The paper introduces some new local search techniques for the revised representation, which are implemented in a new version of the LPG planner (Gerevini, et al. 2003). An experimental analysis indicates that our approach is suitable
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved. 1 A similar compilation of the domain actions into snap actions has been used in (Coles, et al. 2008; 2008b; Long & Fox 2003).
+
+226
+
+Level 1
+(0)
+
+(0)
+
+Level 2
+(0)
+
+Level 3
+(–)
+
+Level 4
+(40)
+
+Goal level
+(40) (40)
+
+p1
+(0)
+
+p1
+(0)
+
+p1
+
+p1
+m.e.
+
+p4
+(40)
+
+p5 e(a2)
+
+p5
+(50)
+
+p5
+(50)
+
+50
+
+astart p2
+(0)
+
+s(a1) p2
+m.e.
+
+s(a2)
+(0)
+
+e(a1)
+m.e.
+
+aend p6
+
+a1 −
+0
+
+0 0
+
+a2 −
+
+40 −40
+
+a2+ 0
+0
+
+a1 +
+0
+
+p3
+(0)
+
+p3
+(0)
+
+p3
+(0)
+
+p3
+(0)
+
+p3
+
+(0)
+
+p3
+
+(50)
+
+astart
+
+−50
+
+aend
+
+of actions a1 and a2. For the action graph: square nodes are action nodes; circle nodes are fact nodes; dashed nodes are no-ops whose propagation is blocked by mutex actions (abbreviated with “m.e.”); the numbers in round brackets are the action start times, with “(–)” indicating an undeﬁned time. For D(CA ): circle nodes are point variables (action start/end times); an edge from x to y labeled t represents constraint y − x ≤ t; the durations of a1 and a2 are 50 and 40, respectively.
+
+Figure 1: An example of TA-graph A with snap actions (action graph on left and D(CA ) on the right) supporting the required concurrency
+
+ance” value for handling strict inequalities) can be computed in O(n3 ) time for n variables in CA (Dechter, et al. 1991; Gerevini & Cristani 1997). A possible schedule of the actions in the plan represented by A can be derived from this solution, and deﬁnes the time values associated with the action nodes of A. In order to support problems with required concurrency, we have revised the TA-graph using snap actions instead of domain actions for labeling the action nodes. We call the revised representation TA-graph with concurrency. Figure 1 shows an example of TA-graph with concurrency A containing four snap actions generated from two planned actions a1 and a2 that must be executed concurrently, and the relative distance graph D(CA ). In the example and in the rest of the paper, a− and a+ indicate the start and end times of a, respectively. The duration d of an action a is encoded in CA by constraints a+ −a− ≤ d, a− −a+ ≤ −d. Each causal/mutex relation involving a planned snap action s(a) (e(a)) generates an ordering constraint in CA involving a− (a+ ), with the following exception needed to properly “protect” overall conditions when dealing with interfering actions: if an action node x at a level k interferes with an overall condition of a snap action node s(a) at a level l < k (hence x and s(a) are mutex), then the ordering constraint generated for handling this interference involves a+ rather than a− . For instance, suppose that in Figure 1 fact p3 is a start effect of a1 and an overall condition of a2, and that ¬p3 is an end effect of a1. Constraint a1− − a2− ≤ 0 ∈ CA because s(a1) supports precondition node p3 of s(a2); a2+ −a1+ ≤ 0 ∈ CA because e(a1) interferes with condition overall p3 of s(a2). A TA-graph with concurrency A may contain two types of ﬂaw: unsupported precondition ode (propositional ﬂaw), and maximum level snap action node involved in a negative cycle of D(CA ) (temporal ﬂaw). This deﬁnition of temporal ﬂaw is motivated by the following property (the proof is omitted for lack of space): the minimum level temporal ﬂaw is an end snap action e(a) identifying the endtime of a planned action a whose duration constraint cannot be satisﬁed given the duration constraints of the actions that, according to CA , must occur concurrently with a. For example, in Figure 1 p4 at level 3 is a propositional ﬂaw; if the duration of a2 were 60, e(a1) would be a temporal ﬂaw, because D(CA ) would contain the negative cycle a1+ ; a2+ ; a2− ; a1− ; a1+ . A TA-graph with no
+
+ﬂaw represents a valid plan.
+
+Local Search for TA-graphs with Concurrency
+Our approach is based on the local search procedure Walkplan (Gerevini, et al. 2003). Starting from an initial TAgraph formed by only action nodes astart and aend , each search step identiﬁes the ﬂaw σ at the minimum level, and deﬁnes the elements of the search neighborhood of the current TA-graph (search state) as a set of modiﬁed TA-graphs where σ is repaired. A relaxed-plan based heuristic is used to select an element from the neighborhood as the best candidate for the next search state. This choice is randomized by a noise parameter helping to escape from possible local minima. In this section, we propose new deﬁnitions of search neighborhood and an extended heuristic function for using Walkplan in the context of TA-graphs with concurrency. The basic search neighborhood N (A) of A for a propositional ﬂaw σ is obtained by adding/removing a pair of “twin” snapaction nodes s(a) and e(a) (with the level of the ﬁrst preceding the level of the second) such that their addition/removal would remove σ.3 The addition/removal of s(a) and e(a) requires an update of CA for adding/removing the duration constraints of a and the appropriate ordering constraints of type (i)-(ii) involving a− and a+ , which have been described in the previous section. In the following, xl denotes an action node x at level l of the current TA-graph A, and lx the level of x. The search neighborhood N (A) of A for a temporal ﬂaw e(a)l is obtained by the following possible graph changes and corresponding updates of C(A): (T1) removing e(a)l and its twin action node s(a)h (h < l), (T2) removing a snap action node x associated with a point variable on a negative cycle ω in D(CA ) such that the maximum level action node of ω is e(a)l (also the twin snap action node of x is removed), (T3) removing e(a) from level l and adding it to a level j, with h < j < l, such that the STP formed by the temporal constraints involving the action nodes at levels lower than or equal to j in the resulting TA-graph is consistent.4
+3 When a pair of snap-action nodes is added, the graph is extended by two levels, and when a pair is removed, the graph is “shrunk” by two levels. More details in (Gerevini, et al. 2003). 4 Level j exists because e(a)l is the minimum level ﬂaw of A.
+
+227
+
+For instance, if e(a1)4 were a temporal ﬂaw in the graph of Figure 1, an example of T3 would be removing e(a1)4 and adding e(a1)2 , since the STP involving only actions s(a1)1 and e(a1)2 would be consistent (in the resulting TAgraph, a2 would not be requested to be during a1 anymore). The search neighborhood for a TA-graph with concurrency can be considerably larger that the neighborhood for the original TA-graph, where each graph modiﬁcation consists of adding or removing only one action node (domain action) instead of two snap action nodes. Table 1 gives empirical evidence of this for some problems without required concurrency, which can be solved by both representations. The neighborhood of a TA-graph with snap actions is on average two orders of magnitude larger than the neighborhood of a TA-graph with domain actions. As a consequence, the local search procedure with snap actions is signiﬁcantly slower. In order to restrict the search neighborhood for TA-graphs with concurrency, we propose an alternative deﬁnition for handling propositional ﬂaws, which constrains the possible ways of adding snap actions and considers an additional type of graph modiﬁcation. The restricted search neighborhood N (A) of A for a propositional ﬂaw σ at a level l is obtained by the following possible graph changes and corresponding updates of C(A): (P1) adding two snap action nodes s(a)i and e(a)l+1 s.t. i ≤ l and the addition of s(a)i removes σ, (P2) adding two snap action nodes s(a)j−1 and e(a)j s.t. 1 < j ≤ l and the addition of e(a)j removes σ, (P3) removing a snap action node x (and its twin snap action node) s.t. the removal of x would remove σ, (P4) removing a snap action node x from a level k < l s.t. the removal of x would remove σ, and adding it to level l + 1. Remarkably, we have experimentally observed that the size of the restricted neighborhood for snap-actions is similar to the size of the neighborhood for domain actions, and LPG with the restricted neighborhood performs much better than with the basic one deﬁned above. The elements in N (A) are evaluated using a heuristic evaluation function E consisting of two weighted terms, estimating the search cost and temporal cost for the elements in N (A), respectively. The temporal cost term is the same as the one deﬁned for TA-graphs with domain actions (Gerevini, et al. 2003). In the rest of this section, we focus only on the search cost term of E for TA-graphs with concurrency, considering ﬁrst the cost for adding a pair of snap actions s(a) and e(a) (changes P1 and P2). For each added snap action, the search cost is estimated by constructing a temporal relaxed plan. The algorithm for constructing the relaxed plan is similar to the one given in (Gerevini, et al. 2003). The overall search cost of adding a pair of snap actions is the sum of the number of actions forming the relative relaxed plans. For the addition of e(a) to A, we construct a relaxed plan achieving three sets of facts (the ﬁrst two of which are also considered in the original heuristic function for TA-graphs without concurrency): (1) the unsupported preconditions of e(a); (2) the supported preconditions of other action nodes in A that would become unsupported by adding e(a); and (3)
+
+Probs D-01 D-05 D-10 D-15 R-01 R-05 R-10 R-15
+
+N with snap-actions μ max Time 3.94 7 0.02 275.2 2947 0.37 457.0 70,073 131.5 48,045 492,964 – 39.14 1010 0.07 405.7 23,708 2.53 1136 34,181 28.9 3296 75,026 63.4
+
+N with domain actions μ max Time 3.45 4 0.01 10.90 45 0.02 19.10 108 0.02 71.47 1518 0.15 10.63 33 0.01 23.23 80 0.02 76.97 420 0.02 86.43 959 0.03
+
+Table 1: Average and max sizes of the basic search neighborhood, and CPU times of LPG using TA-graphs with snap actions and with domain actions for some problems in the “SimpleTime” version of Driverlog (D) and Rovers (R). “–” means no solution within 1000 CPU secs.
+Heuristic EN oT ET 10 0.93 0.02 20 10.8 0.16 30 77.8 0.91 40 – 4.62 50 – 17.1
+
+Table 2: CPU time of LPG using two heuristic functions for 5
+
+problems in domain Match (10, 20, 30, 40, 50 matches). “–” indicates no solution found with 1000 CPU secs.
+
+the supported preconditions that would become unsupported by removing the earliest action node becoming a temporal ﬂaw if e(a) were added to A. Intuitively, (3) is a simple way to estimate the search cost for repairing the earliest temporal ﬂaw introduced into A by adding e(a) through T1. The relaxed plan πs(a) for the search cost of adding s(a) is derived similarly, with the exception that the relaxed plans for s(a) and e(a) have different initial states: for s(a), the initial state Is(a) is derived by applying the actions in A up to level ls(a) − 1; for e(a), it is derived by applying to Is(a) the actions in πs(a) (ignoring negative effects), then s(a), and ﬁnally the actions in A from level ls(a) to le(a) . The search cost for removing a pair of snap action nodes (changes T1, T2, P3), or moving an action node from a level to another one (changes T3, P4) is computed similarly to the cost for adding them, with the difference that the search cost for removing an action node x is estimated by constructing a relaxed plan for the precondition nodes supported by x that would become unsupported by removing x.
+
+Experimental Results
+The techniques presented in the previous sections have been implemented in a new version of the LPG planner, which we tested using four domains with problems requiring concurrency: the known domains Match, Matchlift and DriverlogShift (Coles, et al. 2008) and a new variant of Rovers Simpletime (RoversShift), obtained by adding some ground actions from two new action schemas, which require concurrency in every valid plan. All test domains and problems are available from http://lpg.ing.unibs.it/Concurrency/. The results for LPG were obtained using the restricted search neighborhood for propositional ﬂaws, and correspond to median values over ﬁve runs for each problem considered. All tests were conducted on an Intel Xeon(tm) 2.6 GHz with 3 Gbytes of RAM. Table 2 gives some results comparing the performance of LPG with the heuristic introduced in the previous section
+
+228
+
+Milliseconds 1e+06 1e+05 10000 1000 100 10 0 Makespan 800 700 600 500 400 300 200 100 0 2 4 6 2 4
+
+DriverlogShift LPG.s (15 solved) Crikey3 (14 solved) Crikey (6 solved)
+
+Milliseconds 1e+06 1e+05 10000
+
+Matchlift LPG.s (20 solved) Crikey3 (8 solved) Crikey (5 solved) TFD.s (20 solved)
+
+Milliseconds 1e+05
+
+RoversShift LPG.s (20 solved) Crikey3 (7 solved) Crikey (3 solved)
+
+10000
+
+1000 1000 100 10 6 8 10 12 14 16 0 2 4 6 8 10 12 14 16 18 20 DriverlogShift LPG.q (15 solved) Crikey3 (14 solved) Crikey (6 solved) Makespan 200 160 120 80 40 0 8 10 12 14 16 0 2 4 6 8 10 12 14 16 18 20 Matchlift LPG.q (20 solved) Crikey3 (8 solved) Crikey (5 solved) TFD.q (20 solved) 100
+
+10 0 2 4 6 8 10 12 14 16 18 20 Makespan 2000 1600 1200 800 400 0 0 2 4 6 8 10 12 14 16 18 20 RoversShift LPG.q (20 solved) Crikey3 (7 solved) Crikey (3 solved)
+
+Figure 2: CPU times and makespan of LPG.s, LPG.q, Crikey, Crikey3, TFD.s and TFD.q for DriverlogShift, Matchlift and Rovershift. On the x-axis, we have the problem names simpliﬁes by numbers. On the y-axis, we have CPU time (upper plots) or makespan for the computed plans (bottom plots).
+Score Speed Quality
+LPG.s LPG.q Crikey Crikey3 TFD.s TFD.q
+
+70.8 53.9
+
+42.3 72.2
+
+9.4 30.0
+
+0.5 32.7
+
+3.2 22.7
+
+3.0 24.2
+
+Table 3: IPC-6 performance scores of the compared planners for DriverlogShift, Match, Matchlift and Rovershift. Higher scores correspond to better performance. (ET ), which estimates the cost for repairing the temporal ﬂaws generated into the current TA-graph when adding snap action nodes, and with a simpler heuristic that ignores these temporal ﬂaws (EN oT ). Although ET can be computationally much more expensive than EN oT , these results indicate that LPG with ET performs much better (it is about two orders of magnitude faster). In terms of plan quality, we observed similar performances with ET and EN oT . Figure 2 compares the performance of LPG and three recent prominent temporal planners supporting required concurrency: Crikey (Coles, et al. 2008), Crikey3 (Coles, et al. 2008b) and Temporal Fast Downward (TFD) (Eyerich, et al. 2009). LPG and TFD were tested in terms of CPU time used to compute a solution, denoted by LPG.s and TFD.s, and in terms of quality of the best plan computed using at most 1000 CPU seconds, denoted by LPG.q and TFD.q. From Figure 2 we can observe that: LPG.s solves many more problems and is generally faster than Crikey and Crikey3; for Matchlift, LPG.s is about one order of magnitude faster than TFD.s (TFD does not run with DriverlogShift and RoversShift); the plans computed by LPG.q are generally better than those computed by all the other compared planners, and often they are much better. For Match, we observed similar performance gaps (the plots for this domain are omitted for lack of space). Table 3 gives results about the performance of the compared planners using the IPC-6 performance score functions. This analysis conﬁrms that LPG.s/q performs better than the other compared planners. Finally, we have compared the new version of LPG with
+
+Crikey and TFD also using the Simpletime versions of the known domains Driverlog and Rovers which do not require concurrency. These results indicate that LPG is generally much faster and generates better quality plans w.r.t. the compared planners.
+
+Conclusions and Future Work
+Handling required concurrency in temporal planning is practically and theoretically important. We have proposed an extension of a prominent approach to satisﬁcing planning for handling required concurrently in PDDL2.1 problems, and experimentally demonstrated its effectiveness. Current and future work includes the design of more powerful heuristic techniques for dealing with temporal ﬂaws, new techniques for dynamically splitting the domain actions “when needed” during search, and additional experiments.
+
+References
+Coles, A., Fox, M., Halsey, K., Long, D., and Smith, A. 2008. Managing concurrency in temporal planning using plannerscheduler interaction. Artiﬁcial Intelligence 173(1):1–44. Coles, A., Fox, M., Long, D., and Smith, A. 2008b. Planning with problems requiring temporal coordination. In Proc. of AAAI-08. Cushing, W., Kambhampati, R., Mausam, and Weld, D., S. 2007. When is temporal planning really temporal? In Proc. of IJCAI-07. Dechter, R., Meiri, I., and Pearl, J., 1991. Temporal Constraint Networks, Artiﬁcial Intelligence 49:61–95. Eyerich, P., Robert Mattmüller, and Röger, G. 2009. Using the context-enhanced additive heuristic for temporal and numeric planning. In Proc. of ICAPS-09. Gerevini, A., and Cristani, M., 1997. On Finding Solutions in Temporal Constraint Networks. In Proc. of IJCAI-97. Gerevini, A., Saetti, A., and Serina, I. 2003. Planning through Stochastic Local Search and Temporal Action Graphs. JAIR 20:239–290. Gerevini, A., Saetti, A., and Serina, I. 2003b. Managing Temporal Information for Handling Durative Actions in LPG. In Proc. of AI*IA-03. Long, D., and Fox, M., 2003. Exploiting a Graphplan Framework in Temporal Planning. In Proc. of ICAPS-03.
+
+229
+
+

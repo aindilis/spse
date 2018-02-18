@@ -1,0 +1,247 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+Cost-Optimal Factored Planning: Promises and Pitfalls
+Eric Fabre
+INRIA Rennes - Bretagne Atlantique Rennes, France Eric.Fabre@inria.fr
+
+Lo¨g Jezequel ı
+ENS Cachan Bretagne Rennes, France Loig.Jezequel@irisa.fr
+
+Patrik Haslum and Sylvie Thi´ baux e
+Australian National University & NICTA Canberra, Australia Patrik.Haslum@anu.edu.au Sylvie.Thiebaux@anu.edu.au
+
+Abstract
+Factored planning methods aim to exploit locality to efﬁciently solve large but “loosely coupled” planning problems by computing solutions locally and propagating limited information between components. However, all factored planning methods presented so far work with representations that require certain parameters to be bounded (e.g. number of coordination points between local plans considered); the satisfaction of those bounds by a given problem instance is difﬁcult to establish a priori, and the inﬂuence of those parameters on the problem complexity is unclear. We present an instance of the factored planning framework using a representation of the (regular) sets of local plans by ﬁnite automata, which does not require any such bound. By substituting weighted automata, we can even do factored cost-optimal planning. We test an implementation of the method on the few standard planning benchmarks that we have found to be amenable to factoring. We show that this method runs in polynomial time under conditions similar to those considered in previous work, but not only under those conditions. Thus, what constitutes an essential measure of “factorability” remains obscure.
+
+Introduction
+Identifying and exploiting problem structure is one of the key challenges faced by automated planning and more generally AI. For problems structured as a set of “loosely coupled” subproblems (or components), factored methods which compute local component solutions and propagate limited information between components are appealing and promise exponential reduction of problem-solving effort. Such methods have successfully been applied in constraint satisfaction, probabilistic reasoning, image and speech processing, digital communication, and in many distributed management algorithms for large modular systems. A number of factored planning methods have been proposed, but with more limited success (Amir and Engelhardt 2003; Brafman and Domshlak 2006; 2008; Kelareva et al. 2007). Existing methods provide either no or weak optimality guarantees (Brafman and Domshlak 2008). A mere couple of implementations have been reported, which have been shown to excel only in very few, particular domains (Amir and Engelhardt 2003; Kelareva et al. 2007). Moreover, whilst all published methods are exponential in the treewidth of the instance’s interaction graph, which captures
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+the level of coupling between components, they additionally impose bounds on other parameters, such as the length of the local plans considered, and/or the maximal number of coordination points between pairs of local plans. It is unclear whether those additional restrictions are motivated by the representations adopted by these particular methods (e.g. constraints or SAT), or whether they intrinsically inﬂuence the complexity of the factored planning problem. They lead existing factored planners to search a bounded plan space that may not contain a solution, and to resort to iterative deepening to achieve even completeness. We advance the state of the art in the theory and practice of factored planning, by presenting an instantiation of the factored planning framework which does not impose any bound on the set of plans considered. This is achieved by representing components as ﬁnite automata recognising the (regular) language of valid local plans. This enables us to manipulate all local plans for a component at once, and classical message passing narrows down local plan sets to ensure they are globally compatible. Adopting this more general representation, we make the following contributions: Cost optimal factored planning: by substituting weighted automata (Mohri 2009), i.e. transducers mapping valid local plans to their cost, we devise the ﬁrst cost-optimal factored planning algorithm for arbitrary non-negative action costs. We are not aware of any factored planner providing as strong optimality guarantees. Benchmark analysis: previous factored planners, insofar as they have been implemented, have used a couple of simple, ad-hoc domains for evaluation. We test our (cost-optimal) factored planner on IPC benchmarks. Most of them do not decompose well, yet we are able to identify a few that have the required structure for factored planning to shine, whether at solving problems or proving them unsolvable. Complexity analysis: Bounding tree-width of the interaction graph alone is not sufﬁcient to achieve polynomial time factored planning. We prove that if in addition the length bound considered by Brafman and Domshlak (2008) holds for all plans, then the planner runs in polynomial time.1 However, this is not the only condition under which it does. Our investigations reveal that there are still signiﬁcant gaps in the understanding of factored planning, and suggest a number of avenues for future research.
+In fact, if we impose this bound on the problem artiﬁcially, and wrap it in an iterative deepening search, we obtain essentially the same algorithm.
+1
+
+65
+
+Factored Planning
+We assume a classical planning problem, composed of a set of state variables (either propositions or ﬁnite domain variables) and a set of actions, each described by its preconditions and effects. The objective is to ﬁnd a plan with minimum sum of (non-negative) action costs. Factored planning methods decompose the problem into subproblems, called factors or components. Each component is a planning problem in itself, but they also interact. The graph where interacting components are connected with an edge is called the component interaction graph. Existing factored planning methods require this graph to be a tree: when it is not, it must be transformed into a tree by merging components. This is why the tree-width of the interaction graph, which measures the greatest number of components that have to be joined into one to obtain a tree, is often quoted as one of the basic measures of problem factorability. To decompose the problem, we may partition the set of state variables and let components share actions (Brafman and Domshlak 2006), or we may partition actions and share variables across components (Amir and Engelhardt 2003; Brafman and Domshlak 2008). We choose the former.2 What matters, conceptually, is that each component has a set of locally valid plans. The factored planning problem is to select a valid plan for each component that is compatible with those selected for each of the components it interacts with (i.e., its neighbours in the interaction graph). The combination of those local (sequential) plans, synchronising only execution of shared actions, is then a valid (partially ordered) plan for the global problem.
+
+Since the sets are regular, they can be represented by (deterministic or non-deterministic) ﬁnite automata. The operations that the factored problem solving method requires, viz. projection and product, can be performed – and performed efﬁciently – directly on automata. To guarantee plan optimality, we need a representation that also considers plan costs. For this, we turn to weighted languages and the corresponding weighted automata (Mohri 2009).
+
+Weighted Languages and Optimal Plans
+A (regular) language is a set of strings. A weighted language is a mapping from strings to a domain of numeric values, which we take to be the non-negative reals. Weights are interpreted additively: the product operation on weighted languages sums the weights of the combined strings, while projection minimises over compatible strings. Formally, a weighted language L over alphabet Σ is a function L : Σ∗ → R+ ∪ {∞}, with the convention that L(u) = ∞ when u does not belong to the language. The projection ΠΣ (L) of L on subalphabet Σ ⊂ Σ is such that ΠΣ (L)(u ) =
+u∈Σ∗ ,u|Σ =u
+
+min
+
+L(u),
+
+(1)
+
+where u|Σ denotes ordinary, unweighted projection. The product L1 × L2 of weighted languages L1 and L2 over alphabets Σ1 and Σ2 , respectively, is the weighted language over Σ1 ∪ Σ2 deﬁned by (L1 × L2 )(u) = L1 (u|Σ1 ) + L2 (u|Σ2 ). (2) This ﬁts our interpretation of strings as plans and their weights as plan costs. If L is the set of locally valid plans for a component, with associated costs, and Σ the set of actions it shares with its neighbours, the projection of L onto Σ is the shared action sequences that this component can perform, i.e., an “outside view” of its local plan set, under the assumption that if the component has more than one way to perform a particular shared action sequence, it will choose the cheapest. Similarly, the cost of a plan in the product of two components languages, which is a valid plan for both, sums the costs of the two local plans. This implies that the cost of a shared action must be split between all components that have it; it does not matter how the division is done. A factored planning problem consists of a network of components, each of which has its own weighted regular language, Li over an action set Σi . Their product, L = L1 × . . . × Ln is the language of all globally valid plans. The projection of this language back to the alphabet of component i, Li = ΠΣi (L), is the weighted language of plans that are both locally valid for component i and compatible with some plan for every other component, where weights reﬂect the global plan cost. Theorem 1 If u is an optimal plan in L, with cost w , then u|Σi is an optimal plan in Li = ΠΣi (L), and Li (u|Σi ) = w . Conversely, for any optimal plan ui in Li , there exists an optimal plan u in L such that ui = u|Σi . In other words, knowing the “updated” local language Li for each component allows us to construct a globally valid and optimal plan u by ﬁnding locally valid and optimal plans
+
+Languages and Plans
+Since each component is an ordinary planning problem (essentially, an abstraction of the global problem onto the variables that make up the component), its set of locally valid plans forms a regular language over the alphabet of the components actions. In the shared action model, the condition of compatibility of local plans for two neighbouring components is that their local plans (which are words in their languages) become equal when projected onto the subalphabet of actions that they share. The combination of sets of local plans over overlapping action alphabets corresponds to forming the product of the languages. The product of all components’ languages of locally valid plans equals the set of all globally valid plans. Any concrete instantiation of the factored planning method has to manipulate representations of the regular sets of local plans. If we impose, for example, a constant bound on the length of any local plan, as previously done by Amir & Engelhardt (2003) and by Brafman & Domshlak (2006), these sets can be represented either exhaustively or by a propositional or constraint formula.
+2 There is no essential difference between the two options, as each can be transformed to the other with a linear size increase. To transform a shared action model to a shared variable model, duplicate shared actions and make all variabels they touch shared; in the opposite direction, duplicate shared variables and add actions to perform explicit synchronisation and alternating access.
+
+66
+
+u1 , . . . , un for each component. For illustration, contrast ﬁgure 1(a) and (d) which represent L1 and L1 : in 1(a), the best plan appears to be taking the shared action α, with cost 1, while in 1(d) it can be seen that the global cost of this plan is 7, while the cost of the optimal plan, taking action a, is 3. The global plan is partially ordered; synchronisation is needed only for shared actions, and then only between the components that share the action. In a problem that factors well, components are small, so extracting local optimal plans from a representation of each local language Li is easy. The challenge of factored planning lies in computing those representations without computing any explicit representation of the global language L. This is what the message passing algorithm does.
+
+p a, 3 p α, 1
+b, 4
+
+q1
+
+q α, 2 q
+q2 α, 6
+
+p, q1
+
+a, 3 α, 3
+
+p, q1
+
+α, 2
+p, q2
+
+α, 7 a, 3
+
+p, q2
+
+(a)
+
+(b)
+
+(c)
+
+(d)
+
+Figure 1: (a)–(b) Weighted automata, representing locally valid plans of components 1 and 2. (c) Projection of (b) on the set of shared actions, {α} (after minimisation). This is message M2,1 (see description of the MPA). (d) Product of (c) and (a), representing the ﬁnal plan set of component 1. Note the ﬁnal state cost of 4 in (c)–(d).
+
+The Message Passing Algorithm
+The message passing algorithm (MPA) is a generic distributed optimisation method. It has been used for, e.g., inference in belief networks (Pearl 1986), constraint optimisation (Dechter 2003) and other applications (Fabre 2003). It operates by sending messages along edges of the interaction graph. Messages are objects of the same type as components: in our setting, they are sets of (weighted) plans. Message Mi.j represents the knowledge of component i, incorporating messages it has received from components on its side of the tree, projected on the vocabulary Σi ∩ Σj shared with the receiving component j. After messages have stabilised, the product of the local language of component i with its incomming messages, Li × (×k∈N (i) Mk,i ), yields the updated language Li , from which a globally valid and optimal plan can be extracted. The algorithm requires that ΠΣ (L1 × L2 ) = ΠΣ (L1 ) × ΠΣ (L2 ) for any Σ that contains shared vocabulary of L1 and L2 . This condition holds for weighted languages, and their representation by weighted automata (cf. Fabre and Jezequel 2009). Algorithm 1 The message passing algorithm (MPA) for factored planning. N (i) denotes the neighbours of component i in the interaction graph G. I is the neutral element of ×. Mi,j ← I, ∀(i, j) ∈ G until stability of messages do select an edge (i, j) Mi,j ← ΠΣi ∩Σj Li × ×k∈N (i)\j Mk,i done extract solution from Li = Li × ×k∈N (i) Mk,i , ∀i If the interaction graph is a tree the algorithm converges to a solution in ﬁnite time, no matter in what order messages are sent. Convergence with minimum number of messages is achieved by a two-pass scheme, where the ﬁrst pass starts at the leaves, sending messages along every edge directed towards the (arbitrarily chosen) root, and the second runs back in the opposite direction, starting from the root. Thus, only one message in each direction along each edge is needed, resulting in polynomial runtime when the time to process each message is polynomial. In factored planning, it is not necessary to compute an explicit representation of Li , as long as a (minimum cost) plan can somehow be extracted from (representations of) Li and the MPA works only with projections of Li onto shared subalphabets. If Lpub(i) = ΠΣpub(i) (Li ), where Σpub(i) contains all actions component i shares with any neighbour, then every step of the factored planning algorithm apart from the last may be carried out using Lpub(i) in place of Li . Any implementation of the MPA must operate on a concrete representation of the sets of plans sent as messages. For this, we will use weighted automata.
+
+×k∈N (i) Mk,i . In fact, apart from ﬁnal solution extraction,
+
+Weighted Automata
+Weighted automata (Mohri 2009) are ﬁnite state transducers from strings to numbers, which we take to be nonnegative reals. Formally, a weighted automaton is a tuple A = (S, Σ, T, I, F, ci , cf ) where S is a ﬁnite set of states, among which I, F ⊆ S are the initial and ﬁnal states, Σ is the ﬁnite alphabet (of actions), T ⊆ S × Σ × R+ × S is a ﬁnite set of weighted transitions, and the functions ci : I → R+ and cf : F → R+ assign weights to initial and ﬁnal states.3 An accepting path in A is a sequence of transitions, π = t1 , . . . , tk , that forms a contiguous path from an initial state s0 ∈ I to a ﬁnal state sk ∈ F . The word produced by the path, σ(π), is the corresponding sequence of transition labels. As for ordinary automata, we assume the existence of a distinguished “silent” transition label ; transitions labelled by are invisible in the word produced by the path. The weight of the path is c(π) = ci (s0 ) + ( i=1...k c(ti )) + cf (sk ), where c(ti ) is the weight of ti . The weighted language of A is deﬁned by L(A)(u) =
+paths π in A s.t. σ(π) = u
+
+min
+
+c(π)
+
+(3)
+
+where the minimum is ∞ if A has no path accepting u. In other words, the sequence of actions u is in the language if there is an accepting path that produces it, as usual, and its weight is the minimal weight over all paths that produce u. As usual, A is said to be deterministic if it has a single initial state (|I| = 1) and for any state s and action a ∈ Σ, there is at most one transition (s, a, c, s ) ∈ T .
+3 The initial and ﬁnal state costs play a role in the algorithms for manipulating weighted automata.
+
+67
+
+Operations on Weighted Automata
+To use weighted automata as our representation of plan sets in the factored planning algorithm, we need to be able to form products and project on subsets of actions. For efﬁciency, it is also desirable that we can minimise automata, but this is not essential for correctness or completeness of the method. These operations are well known on ordinary ﬁnite automata; here we brieﬂy sketch how they are extended to the weighted case. We refer to Mohri (2009) for details. The product, A1 × A2 , of two weighted automata is obtained by forming the classical, unweighted, parallel product4 and assigning transition and state weights the sum of their weights in A1 and A2 . Figures 1(a), (c) and (d) show an example. Product preserves determinism: if A1 and A2 are both deterministic, then so is A1 × A2 . The projection of A on a subset of actions Σ ⊆ Σ is obtained by replacing the label of any transition labelled with some a ∈ Σ by the silent label , followed by weighted version of standard -removal. Figures 1(b)–(c) shows an example of projection. Projection may produce a nondeterministic automaton. For efﬁciency, we want to minimise the automata representing messages. The determinisation and minimisation procedures for WA are essentially analogues of those for ordinary automata, but the former is more complicated due to the management of weights. We refer to Mohri’s text (2009) for details. Unlike ordinary automata, not every WA is determinisable. Brieﬂy, the reason is that a non-deterministic WA may accept an arbitrarily long string along paths with different weights, and deciding which path is the cheaper (and therefore the right one) may require looking at the entire string. However, as noted above, determinisation is not essential for either correctness or completeness of the factored algorithm; it is only a tool that may improve efﬁciency. The product (for two WA), projection and minimisation procedures all run in time polynomial in the size of their input. As a convention, we assume that automata are simpliﬁed (“trimmed”) by removing states that are not reachable from any initial state, and states from which no accepting state is reachable. This is also a polynomial time operation. Determinisation, when it is possible, may as usual produce an exponentially larger automaton as output (and thus take exponential time). An important step in proving the complexity results in the next section will be to show that under the right conditions, determinisation is either not required, or possible without the exponential blow-up. Implementation Applying the MPA using weighted automata to represent sets of plans, we obtain a cost optimal factored planner. The construction of initial automata representing sets of locally valid plans for each component is the same as computing the (constrained) abstraction onto the set of variables that belong to the component (just as in the
+4 The parallel product synchronises only transitions with labels that the automata share, leaving each automaton free to take nonshared transitions. Thus, this product mirrors the one on languages: L(A1 × A2 ) = L(A1 ) × L(A2 ). This is unlike the synchronous product, which implements language intersection. The two coincide when A1 and A2 work on the same alphabet.
+
+construction of a PDB). The extraction of a tuple of compatible local plans works like the second pass of the MPA, where each component sends to those below only a single plan. This plan is extracted by direct graph search on its ﬁnal automaton. We have implemented this algorithm, using the OpenFST library5 for automata operations, in a planner called Distoplan.
+
+Conditions for Polynomial Time Complexity
+When the interaction graph forms a tree, the message passing algorithm converges to a solution, using a linear number of messages. In applications like ﬁnite domain constraint optimisation, the size of messages, and the complexity of computing the product of a component and its incoming messages, are bounded by the size of the components themselves. Therefore, bounding component size is sufﬁcient to make the MPA run in polynomial time (assuming basic operations are polynomial time). When the interaction graph is not a tree but has tree-width bounded by w, it can be transformed into a tree with an increase in component size that is exponential only in w. But planning is a harder problem. Even when the interaction graph is a tree, limiting the size of components is not sufﬁcient to prevent messages from growing exponentially.6 This issue has not been observed in previous factored planning methods, due to the choice of message representations that are by their very nature bounded. But the use of such representations also limits the planner to ﬁnding only solutions within the bound, forcing it to use iterative deepening on those parameters to achieve even completeness. Yet, it is possible to ﬁnd conditions that are sufﬁcient to guarantee polynomial runtime also for the factored planning method using the unbounded weighted automaton representation, because the necessary operations (i.e., product and projection) are polynomial in the size of their input. It is simply a question of ﬁnding conditions which limit the size of automata handled by the MPA. We will examine one set of conditions, closely related to those assumed by Brafman & Domshlak (2008), and show that it sufﬁces. The key is bounding the number of shared action occurrences in any locally valid plan. Later we show that this condition is not essential, using an example of a problem where it does not hold but message growth is still polynomial. First, we state a general condition for tractability of factored planning using our representation. In the next two subsections we examine two special cases that imply this condition. Let Ci and Mi,j denote the weighted automata representing component i and the message from i to j, respectively, let Σpub(i) be the subset of actions that component i shares with any neighbour, and let Cpub(i) = ΠΣpub(i) (Ci ). |A| denotes the number of states in automaton A. In this analysis, we need to make a few more speciﬁc assumptions about how the MPA is implemented. First, we assume that it follows the two pass scheme, so no more than one message is sent in each direction along each edge. Second, when computing the outgoing message ΠΣi,j (Ci ×
+http://www.openfst.org/ A simple example demonstrating this can be constructed using a factored binary counter.
+6 5
+
+68
+
+Mj1 ,i × . . . × Mjk ,i ) of component i, we exploit that ΠΣi,j (Ci ) = ΠΣi,j (Cpub(i) ) and that product is associative, by computing Cpub(i) = (. . . (Cpub(i) × Mj1 ,i )× . . .)× Mjk ,i , incrementally, using the messages received by i so far, and then each outgoing message as ΠΣi,j (Cpub(i) ). This way, Mj1 ,i × . . . × Mjk ,i is never computed explicitly. The result Cpub(i) computed in the ﬁrst pass is kept, and updated with the additional message in the second pass. Finally, as noted earlier, a factored planner must only extract a minimum cost element (plan) of L(Ci × (×k∈N (i) Mk,i )), which does not, in principle, require Ci to be made explicit. Theorem 2 Let n be the number of components, and poly(n) a polynomial in n. If the component interaction graph is a tree, and (a) |Cpub(i) | ≤ poly(n), and Cpub(i) is computable in time polynomial in n, for each component i; (b) |Mi,j | ≤ poly(n), for each pair i, j; (c) |Cpub(i) | ≤ poly(|Cpub(i) |+|Mj1 ,i |+. . .+|Mjk ,i |), where Cpub(i) = Cpub(i) ×Mj1 ,i ×. . .×Mjk ,i , for each component i and subset of neighbours {j1 , . . . , jk } ⊆ N (i); (d) Mi,j = ΠΣi,j (Cpub(i) ) is computable in time polynomial in |Cpub(i) |; and (e) given a WA A over Σpub(i) , a minimum cost plan in L(Ci × A) can be found in time polynomial in n; then the run time of the factored planner is polynomial in n. Proof (sketch): The two-pass MPA requires only a linear number of messages to be sent and processed. Conditions (a)–(d) imply that each step of generating and processing each message is polynomial. Condition (e) ensures that the 2 ﬁnal plan extraction is also polynomial. Determinisation is the only potentially non-polynomial step in processing a message: in cases where it is not needed, or does not produce an exponential blow-up (as, for example, in the proof of lemma 5), condition (d) is met. If the number of state variables in each component is at most a logarithmic function of n, then the size of each component automaton, Ci , is polynomial in n, and plan extraction can be done in polynomial time by simply searching Ci × (×k∈N (i) Mk,i ). Thus, in this case, conditions (a) and (e) of theorem 2 are easily met. However, as pointed out by Brafman and Domshlak (2008), this restriction can be waived if each component has some other property that allows a (minimum-cost) plan, compatible with constraints on the shared parts of the plan, to be found in polynomial time. Conversely, if components have no such property, the following holds: Theorem 3 If extracting a plan in polynomial time requires |Ci | to be polynomially bounded, then any problem that the factored planning method solves in polynomial time has a polynomial length plan, if it has any plan at all. Theorem 3 implies that for problems known to have a plan, when we do not care about optimality, the unbounded automata representation offers no complexity theoretic advantage over using a representation with bounded local
+
+plan length in an iterative deepening search. But the unbounded factored method can also – under the right conditions – prove unsolvability and optimality in polynomial time, whereas a method using a length-bounded representation can never prove anything more than that there is no (better) plan within the length bounds examined so far. In this respect, such methods are similar to encoding bounded planning into, e.g., SAT.
+
+Bounded Shared Sequence Length
+Brafman and Domshlak (2008) consider a setting where the number of shared action occurrences in any local plan for any component is bounded by a constant K, and each local planning problem, taking account of constraints imposed by incomming messages, can be solved in polynomial time. Under these restrictions, they show that the problem can be encoded as a CSP which can be decided in polynomial time. (To actually solve the planning problem, they repeat this for increasing values of K, up to the smallest that allows a plan to be found, or up to 2|V | , where V is the set of state variables, if no solution exists.) Next, we show that this assumption implies part of our tractability condition. Like Brafman and Domshlak (2008), we leave the mechanism by which local component plans, compatible with constraints imposed by neighbour components, are extracted open, assuming only that it runs in polynomial time.7 Thus, if we impose this bound artiﬁcially and apply iterative deepening, we obtain the same complexity guaratees for non-optimal planning (on solvable instances). Theorem 4 If condition (e) of theorem 2 holds, and if for each component i, |Σpub(i) | ≤ M and every locally valid plan contains at most K shared action occurrences, where M and K are constant, then conditions (a)–(d) are also met. Proof: Lemma 5 (below) gives that |Cpub(i) | is polynomially bounded. Moreover, when condition (e) holds Cpub(i) can be constructed in polynomial time, by enumerating sequences of at most K shared actions. Conditions (b) and (d) also follow from lemma 5, and condition (c) from lemma 6. 2 Lemma 5 Let A be a weighted automaton over alphabet Σ, and Σ ⊂ Σ. If for any word in w ∈ L(A), |w|Σ | ≤ K, i.e., w contains at most K letters from Σ , then ΠΣ (A) is a determinisable WA, and determinisation of this automaton results in a WA that has no more than K|Σ |K states. Proof: The automaton obtained by projecting A on Σ may be non-deterministic, but it is determinisable. In short, the reason for this is that it cannot accept strings of arbitrary length (Mohri 2009). Since the length of words in L(ΠΣ (A)) is bounded by K, there are at most |Σ |K distinct words in the weighted language, and at most K|Σ |K distinct preﬁxes of words in this language. Therefore, any deterministic automaton representing this language can reach at most K|Σ |K distinct states. Determinisation does not produce an automaton containing states that cannot be reached, nor dead end states
+7 Note, however, that our implementation does compute component automata explicitly, and uses a plain search for plan extraction.
+
+69
+
+b1 0
+
+b1 1 (a)
+
+···
+
+b1 m
+
+bi L bi−1 (b) H L bn−1 (c) H
+
+and, by another induction, that message Mi,i−1 is
+0 bi−1 ··· bi−1 k
+
+(k = n − i + 1)
+
+(5)
+
+Figure 2: Automata representations of components (a) C1 , (b) Ci , i = 2, . . . , n − 1, and (c) Cn . if the input automaton does not have them. Hence, determinisation of ΠΣ (A) results in an automaton with at most K|Σ |K states. 2 Lemma 6 Let j1 , . . . , jd be neighbours of i, and for each jk , Σi,jk their set of shared actions. If Cpub(i) and each Mjk ,i are deterministic, and any plan accepted by Cpub(i) contains at most K (shared) actions, then Cpub(i) = Cpub(i) × Mj1 ,i × . . . × Mjd ,i is a deterministic WA and minimisation of this automaton results in a WA that has no more than K|Σpub(i) |K states. Furthermore, any plan accepted by Cpub(i) contains no more than K (shared) actions. Proof: Product preserves determinism: hence Cpub(i) is deterministic, and therefore minimisable. L(Cpub(i) ) contains at most |Σpub(i) |K distinct sequences. The language accepted by Cpub(i) ×Mj1 ,i ×. . .×Mjd ,i is, modulo weights, the intersection of L(Cpub(i) ) and L(Mj1 ,i )∩. . .∩L(Mjd ,i ), so it too cannot accept more than |Σpub(i) |K distinct sequences. Thus, there is a deterministic preﬁx tree automaton (like that in the proof of lemma 5) with at most K|Σpub(i) |K states accepting L(Cpub(i) × Mj1 ,i × . . . × Mjd ,i ). 2
+
+The base cases are simple: M1,2 equals C1 and Mn,n−1 equals Cn , since all their actions in shared. Mi,i+1 = Π{bi } (Ci × Mi−1,i ). By inductive assumption, the product Ci × Mi−1,i is
+0,L bi−1 1,H bi 1,L bi−1 2,H bi 2,L bi−1 ··· bi−1 k,H bi k,L
+
+where k = m − i + 1. Trimming state k,L and projecting on {bi } gives Mi,i+1 as in (4). Similarly, Ci × Mi+1,i is
+0,L bi−1 0,H bi 1,L bi−1 1,H bi 2,L bi−1 ··· bi−1 k,H
+
+where k = n − i + 1. Projecting on {bi−1 } gives (5). If m − r + 1 ≥ n − r + 1, the product Cr × Mr−1,r × Mr+1,r is the same as Mr,r−1 shown above. If m−r+1 < n−r+1, it has no reachable accepting state, as expected since in this case the problem is unsolvable. The messages sent from Cr to Cr−1 etc. down to C1 continue the same pattern, while the messages from Cr to Cr+1 etc. up to Cn are identical to those sent in the opposite direction. Thus, the size of all intermediate results is bounded by n or m, giving conditions (b) and (c) of theorem 2. Condition 2 (d) is met since no determinisation is needed.
+
+Planning Benchmarks
+We believe that the majority of existing planning benchmarks are not suited to factoring, but since no adequate measure of “factorability” is yet known, we can only offer anecdotal evidence of this. We have examined indicative measures of the interaction graphs, and, of course, tried to come up with working decompositions but failed. As an example, many domains involve objects moving, or being transported, on a “roadmap” or network. These can be decomposed along the network structure, but in this decomposition, the size of each component grows with the total number of moving objects in the problem, since all components must distinguish for each object if it is or is not present. Even in planning domains where the underlying problem intuitively ought to be amenable to factoring, we often ﬁnd that the particular PDDL encodings of those benchmarks do not factor well, or at least not well enough for factored planning to pay off. Amir & Engelhardt (2003) tested their factored planner on a simple “robot & rooms” domain. We have done the same, and found that our planner scales polynomially with problem size. More relevantly, we have found three standard (IPC) planning benchmark domains for which we were able to formulate new PDDL encodings of their underlying problems in such a way that growing problem size is primarily reﬂected in the number of components (i.e., size of individual components remains either constant, or tends to grow more slowly). The domains are the two Promela domains (Philosophers and Optical-Telegraph) and Pipesworld (with and without tankage restrictions).8 Results on these domains are mixed.
+8 The alternative PDDL encodings are available from us on request. The fact that all domains hail from IPC4 is a coincidence.
+
+Bounded Shared Sequence Length Is Not Essential
+Above we have shown that bounding the number of shared action occurrences in any local plan is sufﬁcient to ensure polynomial runtime. Next we show that it is not necessary, i.e., that the factored planner using the weighted automata representation provably runs in polynomial time also on certain problems where no such bound holds. We examine a scaling family of problems. Each consists of n components in a line (n ≥ 3), whose automata are as shown in ﬁgure 2. Component C1 can take transition b1 (shared with C2 ) at most m times, where m ≤ poly(n). A plan exists iff m ≥ n. Note that components Ci , 1 < i < n, have locally valid plans that contain an unbounded number of shared action occurrences; hence theorem 4 cannot be used to show tractability on this problem set. Theorem 7 The factored planner decides this problem in time polynomial in n. Proof: The interaction graph is a tree (a simple chain). The size of each component automaton is bounded by m, so conditions (a) and (e) of theorem 2 are met. Pick any component r to be the root. In the ﬁrst pass, messages are sent from C1 to C2 to C3 etc. up to Cr , and from Cn to Cn−1 to Cn−2 etc. down to Cr . We show, by induction, that message Mi,i+1 is
+0 bi ··· bi k
+
+(k = m − i + 1)
+
+(4)
+
+70
+
+The Promela Domains The IPC4 Promela domains are PDDL encodings deadlock detection problems, generated by automatic translation from models in the Promela language (Hoffmann et al. 2006). The two domains model the classic “dining philosophers” example, and a communications protocol for an optical telegraph system. Both are deadlockable, but can be made deadlock free by a small change to the model (in the case of the dining philosophers, make one of the philosophers pick up his forks in opposite order; in the optical telegraph model, arrange the stations in a line instead of a circle). Promela models are made up of processes communicating via message channels (queues). In both domains models, the network of processes and channels forms a ring, i.e., each process communicates only with two neighbouring processes (via one or two channels for each). Thus, if each process and channel is made into a component, we would expect to ﬁnd a very sparse interaction graph. However, the IPC4 PDDL encoding – because it is based on a general, automatic translation from Promela – enforces a global synchronisation between processes and channels, which makes the interaction graph effectively a clique. We have devised alternative PDDL encodings of both domains which yield the expected interaction structure. (The tree-width of the interaction graph is 2 for Philosophers problems, and at most 4 in the Optical-Telegraph domain.) The encodings are straightforward; the only difﬁculty is in expressing the global deadlock condition (which is the goal) locally. This is done by allowing each process to conditionally block when none of its normal transitions in the current state are applicable (e.g., when the fork it needs to pick up is already taken). The conditional blocking action marks the related channel so that from this point on no other action which would unblock the process (e.g., by returning the missing fork) can take place. When all processes are conditionally blocked, the system is deadlocked. Experiments and Results Figure 3 summarises experiment results in the Promela domains. The results are mostly expected: The factored planner scales polynomially with increasing problem size, and it is totally unaffected by whether the problem has a solution (deadlock) or not. In the OpticalTelegraph domain, the planner spends most of its time (around 90%) constructing initial automata. As points of comparison, we tested SATPLAN (the IPC 2006 version; Kautz, Selman, and Hoffmann 2006) and the Fast Downward implementation of state space search with the recent landmark cut heuristic (Helmert and Domshlak 2009). As expected, SATPLAN is lightning-fast at ﬁnding solutions in the deadlockable problems, but it is completely unable to prove unsolvability of even the tiniest deadlock free instance. The heuristic search based planner scales exponentially, except on solvable instances of the Philosophers domain, where the landmark cut heuristic turns out to achieve perfect accuracy. Pipesworld The Pipesworld domain models the problem of transporting (liquid) products through a network of pipelines and transit areas. The main simpliﬁcation of the planning benchmark, compared to the real application, is that the continuous ﬂow of liquid is divided into discrete,
+
+  !"# $%&'(
+
+  !"#
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+(a)
+
+(b)
+    
+
+
+
+
+
+    
+ !"#$ 
+   
+  
+
+(c)
+
+
+
+
+(d)
+
+Figure 3: Planner runtimes (logarithmic scale) on the alternative PDDL encodings of Promela domains: (a) Philosophers, deadlockable; (b) Philosophers, deadlock free; (c) Optical-Telegraph, deadlockable; (d) Optical-Telegraph, deadlock free. unit-sized “batches” (Hoffmann et al. 2006). The pipeline networks are fairly sparse, and operations on each pipeline affect only the adjacent transit areas, so the problem can be decomposed along the network structure. However, the IPC4 PDDL encoding gives every batch a unique name (whereas in the real application, only the type of product it is made up of matters). Just as in other “named object” movement domains, this makes components grow in size with the total number of batches in the system, which grows, quite fast, with network size. We replace the named batches by (bounded) counters keeping track of the number of batches of each product type in each area. For each pipeline segment, we use a number of ordered “slots”, equal to the segment length, which record what type of product is at each position (this is needed to model the FIFO behaviour of a pipe). In this encoding, component automata grow with the maximum number of batches of each type, which is typically a smaller quantity (across the IPC4 problem set, the maximum is 9). Limitations on storage space in areas, which are modelled in the “tankage” version of the domain, further limit the range of counters. Mapping problem instances from the IPC4 Pipesworld encoding to our formulation is not as straightforward as in the Promela domains. Depending on whether we interpret the goal as absolute (i.e., “have N units of type X at A”) or relative (i.e., “have N units more of type X at A”) we can end up with problems that are much easier, or problems that are unsolvable. We experimented with both mappings. Results and Analysis The reformulated Pipesworld domain seems like a good candidate for a problem suited to factored planning, but the performance of the planner is disappointing: it fails to solve even the smallest IPC instances in reasonable time. To understand why, we examine a family of simple problem instances, shown schematically in ﬁgure
+
+71
+
+2^3
+
+8^3
+
+10^3
+
+12^3
+
+Size (Cubed)
+
+(a)
+
+(b)
+
+Figure 4: (a) Layout of the Pipesworld problem (two product types). Dashed lines mark component boundaries. Ai’s are storage areas, Pi’s are pipes; white slots are empty. The goal is to have one batch of type X at An. (b) Runtime vs. n3 . 4(a). On these instances, the planner scales roughly as n3 , as shown in ﬁgure 4(b). We can show a lower bound on the size of messages sent, which is polynomial in the length of the component chain (actually, in the total amount of storage spaces in it) but exponential in the number of different product types. The main reason for this is that the message sent from the ith component to its neighbour describes all possible plans for the subsystem to one side of it, assuming no constraints from the other. We conjecture that there is a similar upper bound. Even though the smaller instances in the IPC4 set have networks that are short lines like this, the number of products and storage capacities are much higher than in our problem, causing message sizes to rise very rapidly.
+
+representation. And, of course, the most compact representation we have of a set of plans is a planning problem. The question is how to perform projection on it? Finally, we have observed that current planning benchmarks do not factor well. In some cases, this can be blamed on the encoding, but in most, it appears to us that no amount of reformulation is going to help. We conjecture that a reason for this is that planning benchmarks usually model only one narrow aspect of an application problem. If we were tackling an integrated planning problem, e.g., involving logistics, inventory management, production planning, etc., opportunities for decomposition would naturally arise. Acknowledgements This work was supported by the Franco-Australian program for Science and Technology, Grants 18616NL and FR080033. E. Fabre is also supported by the European 7th FP project DISC (DIstributed Supervisory Control of large plants), Grant INFSO-ICT-224498, and by the INRIA/ALU-Bell joint research lab. S. Thi´ baux e and P. Haslum are supported by the Australian Research Council discovery project DP0985532 “Exploiting Structure in AI Planning”.
+
+Runtime (linear)
+
+0
+
+400
+
+800
+
+1200
+
+References
+Amir, E., and Engelhardt, B. 2003. Factored planning. In Proc. IJCAI’03. Brafman, R., and Domshlak, C. 2006. Factored planning: How, when and when not. In Proc. AAAI’06. Brafman, R., and Domshlak, C. 2008. From one to many: Planning for loosely coupled multi-agent systems. In Proc. ICAPS’08. Dechter, R. 2003. Constraint Processing. Morgan Kaufmann. Fabre, E., and Jezequel, L. 2009. Distributed optimal planning: an approach by weighted automata calculus. In Proc. CDC’09. Fabre, E. 2003. Convergence of the turbo algorithm for systems deﬁned by local constraints. Research report PI 4860, INRIA. Helmert, M., and Domshlak, C. 2009. Landmarks, critical paths and abstractions: What’s the difference anyway? In Proc. ICAPS’09. Hoffmann, J.; Edelkamp, S.; Thi´ baux, S.; Englert, R.; Lie porace, F.; and Tr¨ g, S. 2006. Engineering benchmarks u for planning: the domains used in the deterministic part of IPC-4. Journal of AI Research 26:453–541. Kautz, H.; Selman, B.; and Hoffmann, J. 2006. SATPLAN: Planning as satisﬁability. In 5th International Planning Competition Booklet. http://zeus.ing.unibs. it/ipc-5/. Kelareva, E.; Buffet, O.; Huang, J.; and Thi´ baux, S. 2007. e Factored planning using decomposition trees. In Proc. IJCAI’07. Mohri, M. 2009. Weighted automata algorithms. In Handbook of Weighted Automata. Springer. chapter 6, 213–255. Pearl, J. 1986. Fusion, propagation, and structuring in belief networks. Artiﬁcial Intelligence vol. 29:241–288.
+
+Conclusions
+There are still signiﬁcant gaps in our understanding of factored planning. What are adequate measures of factorability, and how can we use them to automatically detect and decompose problems amenable to factoring? What restrictions are essential to guarantee polynomial complexity? Bounded tree-width (of some interaction graph) is known to be necessary, but not sufﬁcent; we have shown that additionally limiting the number of shared action occurrences is sufﬁcient, but not necessary. Previous factored planning methods have used bounded representations in combination with iterative deepening, essentially running the factored solver many times, whereas we use an unbounded representation to compute all valid plans in one run. Both methods have their ﬂaws: The iterative method cannot prove unsolvability nor optimality without exhausting the bound space. Our method requires stronger conditions to guarantee polynomial runtime, which is overkill for solvable instances of non-optimal planning. There is a space of other possibilities to explore: intelligent combinations of backtracking search and computing entire sets of local plans, and alternative message passing strategies such as iteratively tightening constraints across the whole system using multiple passes. Analysis of the cases where the factored planner fails suggest we should perhaps be looking at more powerful representations, instead of the (less powerful) intrinsically bounded ones. For example, there are regular expressions with exponentiation, which have a corresponding automata
+
+72
+
+

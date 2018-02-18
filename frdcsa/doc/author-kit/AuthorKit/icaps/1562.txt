@@ -1,0 +1,130 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+When Policies Can Be Trusted: Analyzing a Criteria to Identify Optimal Policies in MDPs with Unknown Model Parameters
+Emma Brunskill
+Computer Science Division University of California, Berkeley emma@cs.berkeley.edu
+
+Abstract
+Computing a good policy in stochastic uncertain environments with unknown dynamics and reward model parameters is a challenging task. In a number of domains, ranging from space robotics to epilepsy management, it may be possible to have an initial training period when suboptimal performance is permitted. For such problems it is important to be able to identify when this training period is complete, and the computed policy can be used with high conﬁdence in its future performance. A simple principled criteria for identifying when training has completed is when the error bounds on the value estimates of the current policy are sufﬁciently small that the optimal policy is ﬁxed, with high probability. We present an upper bound on the amount of training data required to identify the optimal policy as a function of the unknown separation gap between the optimal and the next-best policy values. We illustrate with several small problems that by estimating this gap in an online manner, the number of training samples to provably reach optimality can be signiﬁcantly lower than predicted ofﬂine using a Probably Approximately Correct framework that requires an input parameter.
+
+Many real-world planning challenges take place in uncertain, stochastic domains. Such problems are even more challenging when the reward and dynamics model parameters that describe the domain are initially unknown. It is necessary to implicitly or explicitly estimate these parameters in order to compute a good plan for said domains, even though the model parameters themselves are not of interest. In a number of interesting planning domains, such as game playing agents, space robots such as the Mars rover or Robonaut, or medical applications including epilepsy management (Guez et al. 2008), it may be reasonable to expect to have an extended training period, during which suboptimal plans can be computed and tried. However, after training completes, it is important to ensure the resulting policy is optimal with high probability. For example, a patient could be monitored in a hospital until drug dosage schedules have been tuned for the patient, but mistakes made when the patient is far from medical facilities could be severe. In such applications, we wish to know when the computed policy
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+can be used with high conﬁdence in its future performance. We analyze a criteria for this optimal policy identiﬁcation. Computing a policy, a mapping of states to actions, while learning the model parameters falls under the class of reinforcement learning (RL). There has been a large body of approaches to balancing the tradeoff between model parameter identiﬁcation and planning using the existing estimated models, commonly known as the tradeoff between exploration and exploitation. Perhaps the most promising approaches for this tradeoff are recent techniques that pose this challenge as a partially observable Markov decision process (POMDP) planning problem, by computing plans over the cross product of the system state and model parameters (see for example Poupart et al. (2006), Asmuth et al. (2009), and Kolter and Ng (2009)). Another popular approach for solving planning problems with initially unknown model parameters are Probably Approximately Correct (PAC) reinforcement learning algorithms, such as Brafman and Tennenholtz’s (2002) R-max algorithm. For an input δ and , PAC RL algorithms guarantee that each action selected will have a value that is -close to the value of the optimal action, on all but a number of steps that is polynomial function of δ and , with probability at least 1 − δ. Neither POMDPnor PAC-style approaches explicitly seek to identify when the optimal policy has been found with high likelihood. The criteria we discuss for identifying the optimal policy can be used in conjunction with these and a wide variety of other techniques for planning with unknown model parameters. We consider domains described as ﬁnite-state and ﬁniteaction Markov decision processes (MDPs). The optimal policy for an MDP has been identiﬁed when the error bounds on the estimated state-action values do not change the resulting policy, with high probability. This criteria for identifying the optimal MDP policy is essentially identical to the action elimination and stopping criteria presented by Even-Dar and colleagues (2006). We extend this prior work by providing an upper bound on the number of required samples in order to identify the optimal policy as a function of the unknown separation gap between the optimal and next-best state-action values. We illustrate with several small problems that by estimating this gap in an online manner, the number of training samples to provably reach optimality can be signiﬁcantly lower than predicted by PAC-RL approaches that requires an input parameter.
+
+218
+
+state-action values, respectively, computed using the esti˜ mated dynamics model T , and let V and Q be the optimal state and state-action values computed using the unknown true dynamics model T . The difference between the optimal and estimated state-action values is ˜ ΔQ (s, a) = |Q(s, a) − Q(s, a)|. max We will use ΔQ to denote the maximum such difference over all state-action pairs. We can then substitute in the expression for Q(s, a) from Equation 1, ˜ ¯ Figure 1: (left) Q estimates and (right) the Q values (shown by thick horizontal lines) which use the lower bound of the ˜ best Q action, and the upper bounds of all other actions. ¯ ˜ a2 maximizes the Q value, but a1 maximizes Q, showing the policy for this state could change given the current error bounds, and is not yet guaranteed to be optimal.
+ΔQ (s, a) = ˛ ˛X X ˛ ˜ ˜ Ts,a (s )V (s γ˛ Ts,a (s )V (s )− ˛ ˛s s ˛ ˛ ˛ )˛ ˛ ˛
+
+˛ ˛ ˛X ˛ X ˛ ˛ ˜ ˜ ˜ = γ˛ V (s )(Ts,a (s )− Ts,a (s ))˛ Ts,a (s )(V (s ) − V (s ))+ ˛ ˛ ˛s ˛ s X ˜ , a2 ))|+γ Vmax L1 (Ts,a , Ts,a ) ˜ ˜ ≤ γ| Ts,a (s ) max(Q(s , a2 )− Q(s
+s a2
+
+Background
+A MDP is a tuple S, A, Ts,a (s ), R(s, a), γ , where S and A are the discrete set of states and actions; Ts,a (s ) is the dynamics model that expresses the probability of starting in state s, taking action a and arriving in state s ; R(s, a) is the deterministic1 reward received from taking action a in state s; and γ is the discount factor. All rewards are assumed to lie between 0 and a known Rmax . The goal is to learn a policy π : S → A. The value of a policy π for a state s is the expected sum of future rewards from following policy π starting in state s: ⎤ ⎡ V π (s) = E ⎣
+∞
+
+≤
+
+˜ ˜ γΔmax +γ Vmax L1 (Ts,a , Ts,a ) Q
+
+(2)
+
+˜ where we have added and subtracted Ts,a (s )V (s ), used ˜ the triangle inequality, upper bounded V by its maxi˜ mum value Vmax , and used the deﬁnition of the L1 norm, ˜ ˜ L1 (Ts,a , Ts,a ) ≡ s ∈S |Ts,a (s ) − Ts,a (s )|. Equation 2 must hold for Δmax , Q ˜ ˜ γΔmax + γ Vmax L1 (Tsm ,am , Tsm ,am ) Q ˜ ˜ γ Vmax L1 (Tsm ,am , Tsm ,am ) Δmax ≤ , (3) Q 1−γ where sm and am are the state-action pair with the largest L1 error. Therefore the maximum error will be bounded above by the largest L1 difference between the transition models ˜ (over all state-action pairs) and the maximum value Vmax . This is a known result that has been used in past PAC RL proofs (see e.g. Strehl and Littman, 2005). Given a bound on the L1 norm of the transition model that holds with probability at least 1 − δ, Equation 3 can be used to determine if the policy has converged with high probability to the optimal plan (see Algorithm 1). Brieﬂy, the algorithm returns that convergence has not occurred if any state-action pairs have not yet been sampled, since this is required in order to obtain an estimate of, and a well-deﬁned bound on, the transition dynamics of each state-action pair. After all state-action pairs are sampled at least once, the deterministic reward model will be known exactly. On any future time steps, Algorithm 1 involves computing an error bound on the state-action values and checking if the best action for any state-action pair could change given the potential error in the estimated state-action values. If the best action stays the same for all states, then the policy has converged. To handle states where there are two or more actions with the same optimal state-action value, in addition to δ the user should also provide an error bound min : Algorithm 1 returns true when the optimal policy has been reached or the maximum state-action value error is min . Δmax Q ≤
+
+γ j r(sj , π(sj ))|s0 = s ⎦ ,
+
+j=0
+
+where r(sj , π(j)) is the reward received at step j, s0 is the initial state and the expectation is taken with respect to the transition dynamics. Similarly, the state-action value Qπ (s, a) is : Qπ (s, a) = R(s, a) + γ
+s ∈S
+
+Ts,a (s )V π (s ).
+
+(1)
+
+Initially the parameters of the reward R and transition model T are unknown.
+
+Optimal Policy Identiﬁcation
+In this section we describe a procedure for identifying when the optimal policy has been found, with high probability. This procedure is semantically equivalent to the stopping criteria presented by Even-Dar and colleagues (2006) though our presentation is slightly different. The key idea is to maintain uncertainty bounds around the estimates of the state-action values, and consider whether the best action for a particular state could change given these bounds: see Figure 1 for a graphical illustration. The stateaction values depend on the current dynamics model parameter estimates which are computed from the observed state˜ ˜ action-next state transitions. Let V and Q be the state and
+We believe the results are easily extendable to unknown, stochastic rewards.
+1
+
+Bounding the Transition Model Error
+To compute an upper bound on the L1 distance between the estimated and true dynamics models, we estimate con-
+
+219
+
+ﬁdence bounds on the model parameters. Since the dynamics models are multinomials, there exist known conﬁdenceintervals, developed by Weissman et al. (2003). Strehl and Littman (2005) extended these bounds using the union bound and results from Fong (1995), to a reinforcement learning context: their bound ensures that the computed intervals are consistent over all state-action pairs, at each time step. More precisely, from Strehl and Littman we know that for a given δ, with probability at least 1 − δ, the L1 distance between the estimated transition model for a state˜ action pair Ts,a and the true transition model Ts,a is at most: ˜ L1 (Ts,a , Ts,a ) ≤ 2 ln( (2
+|S| −2)2|S||A|π 2
+
+Algorithm 1 OptimalPolicyReached ˜ Input: estimated state-action values Q, transition counts ns,a for all state-action pairs, δ,γ, min if ∃ns,a < 1 then return False; end if ˜ ∀s ∈ S, ∀a ∈ A, compute L1 (Ts,a , Ts,a ) using Eqn. 4. max Compute ΔQ using Eqn. 3 for s ∈ S do ˜ a∗ = maxs Q(s, a) ˜s ¯ a∗ ) ≡ Q(s, a∗ ) − ΔQ (s, a∗ ) ˜ ˜s Q(s, ˜s ˜s ¯ a) ≡ Q(s, a) + ΔQ (s, a) ∀a = a∗ ˜ Q(s, ˜s ¯ ˜s if argmaxa Q(s, a) = a∗ and Δmax > min then Q return False; end if end for return True; require Δmax to be at most g/2. From Equation 3 we see Q that to ensure Δmax ≤ g/2 it is sufﬁcient to require: Q ˜ ˜ γ Vmax L1 (Tsm ,am , Tsm ,am ) /(1 − γ) = g/2, (6)
+
+3δ
+
+)+4 ln(ns,a )
+
+ns,a
+
+. (4)
+
+where ns,a is the number of times action a has been taken from state s, and π is the circle constant, not the policy.
+
+Convergence to Optimal
+Algorithm 1 provides a criteria for halting exploration. However, so far it is not clear how good the online criteria of Algorithm 1 is, or how it might compare to a PAC-RL algorithm which provides an ofﬂine formula for the number of required samples needed to provide accuracy guarantees on the resulting policy. We now provide promising evidence of the beneﬁt of using the online criteria of Algorithm 1. Let g be the minimal separation gap between the stateaction values of the optimal action a∗ and next-best action: g ≡ min Q(s, a ) −
+s ∗ a s.t.a=a∗
+
+as the left-hand expression is an upper bound for Δmax . We Q ˜ then substitute an upper bound for Vmax ≤ Rmax /(1 − γ) and solve for the error in the transition model: g(1 − γ)2 ˜ L1 (Tsm ,am , Tsm ,am ) = . 2γRmax (7)
+
+max
+
+Q(s, a) .
+
+Note that g will not be known in advance, which is the motivation behind using the online convergence criteria. Indeed, Algorithm 1 can identify the optimal policy when the estimated error in the state-action values, Δmax , becomes Q equal or smaller than the gap g/2, since for this any smaller error bounds, the optimal policy does not change. Essentially Δmax provides an online estimate of the gap g. Q We now bound the number of samples required to achieve optimal performance with high probability as a function of the unknown separation gap. Theorem 1. Given any δ > 0, separation g, and known maximum reward Rmax , deﬁne Ns,a =
+2 (2|S| − 2)2|S||A|π 2 8Rmax γ 2 ln( ) g 2 (1 − γ)4 3δ 2 16Rmax γ 2 . (5) +4 ln g 2 (1 − γ)2
+
+r
+
+To ensure Equation 7 holds with probability at least 1−δ it is sufﬁcient (from Equation 4) to ensure an upper bound on the L1 error is bounded by the right-hand side of Equation 7:
+2(ln( (2|S| − 2)2|S||A|π 2 g(1 − γ)2 ) + 2 ln(Ns,a ))/Ns,a = . 3δ 2γRmax
+2 8Rmax γ 2 (2|S| − 2)2|S||A|π 2 ln( )+ 2 (1 − γ)4 g 3δ 2 16Rmax γ 2 ln(Ns,a ). (8) 2 (1 − γ)4 g
+
+Solving for Ns,a yields Ns,a =
+
+Then if there are at least Ns,a transition samples for each state-action pair (s, a) then with probability at least 1 − δ the computed policy using the estimated transition model ˜ parameters T will be optimal. Proof. (Sketch) If the state-value uncertainty bounds are less than or equal to g/2 then the policy does not change when these the error bounds are incorporated. Therefore we
+
+The above expression is equivalent to n = D + C ln(n) where D and C are positive constants. It is well known fact (used in the proofs of Strehl and Littman (2005), among others) that if N ≥ 2C ln(C) then N ≥ C ln(N ). This implies if N ≥ C ln(N ) then 2C ln(C) ≥ C ln(N ), which implies D + 2C ln(C) ≥ D + C ln(n) and therefore it is sufﬁcient to satisfy Equation 8 to set Ns,a as Ns,a =
+2 8Rmax γ 2 (2|S| − 2)2|S||A|π 2 ln( )+ 2 (1 − γ)4 g 3δ 2 2 16Rmax γ 2 32Rmax γ 2 , (9) ln 2 (1 − γ)4 2 (1 − γ)4 g g
+
+which is the deﬁned Ns,a in our theorem.
+
+220
+
+Sample Bounds
+The above bound is very similar to the bounds produced in Probably Approximately Correct planning with unknown model parameters, the key difference is that our bound is deﬁned in terms of g instead of an input parameter . We now provide several example problems where we can directly solve the MDP and calculate g explicitly in order to demonstrate that g may be larger than an arbitrary chosen ofﬂine for a PAC-RL-style algorithm. These results imply that for these problems, if Algorithm 1 was used to identify the optimal policy by calculating an online estimate of the separation g, the number of samples required would be fewer than the ofﬂine number of samples computed by PACRL algorithms that commit to an overly conservative . We consider three sample MDP problems. Chain is a 9state MDP used by Dearden, Friedman and Russell (1998). PittMaze MDP (see Figure 2) is a 21-state grid maze MDP with 4 cardinal-direction actions. When Actions succeed with probability 0.6: with 0.2 probability the agent goes in a perpendicular direction, unless there is a wall. At the goal the agent transitions to a sink terminal state. Rewards are 0 for self-looping pits, 0.5 for the goal, and 0.495 for all other states. The agent can start in any non-pit state. PittMaze2 is the same as PittMaze1 with re-arranged pits and start states. For each MDP, we computed the sample complexity bound Ns,a we used Equation 5 with either g or an alternate smaller in place of g which (from the proof of Theorem 1) guarantees the resulting maximum state-action error bound Δmax is at most g/2 or /2, respectively. Q Table 1 shows the sample complexity results. In each case, the minimum separation g is such that the maximum number of samples Ns,a per state-action pair to reach the optimal policy is an order of magnitude or smaller than might be expected by a na¨ve selection of the parameter. ı These sample problems suggest that by estimating g online and checking repeatedly whether the optimal policy has been identiﬁed using Algorithm 1, we may need fewer samples to guarantee optimal performance than in PAC-RL approaches which ofﬂine choose an and use this to bound the number of samples for -optimal performance.
+
+Table 1: The number of samples per state-action pair as a function of Δmax (= 2 ) or the minimal separation g. γ = Q 0.9 and δ = 0.5.
+P ROBLEM C HAIN P ITT M AZE 1 P ITT M AZE 2
+G
+
+0.39 0.10 1.87
+
+Δmax Q G /2 0.01 G /2 0.01 G /2 0.1 0.01
+
+Ns,a 5 ∗ 106 2 ∗ 109 7 ∗ 107 2 ∗ 109 1 ∗ 106 1 ∗ 108 1 ∗ 1010
+
+Vmax 4.3 4.3 3.8 3.8 10.5 10.5 10.5
+
+estimated online in Algorithm 1. Our calculation of the sample complexity bounds for several sample problems provide evidence that Algorithm 1 may outperform alternate exploration halting criteria. Though more work is required for these bounds to be practical, our results suggest that focusing on optimal policy identiﬁcation, instead of minimum errors in the optimal values, may reduce the amount of training required to be highly conﬁdent in the computed policy’s future performance.
+
+References
+Asmuth, J.; Li, L.; Littman, M.; Nouri, A.; and Wingate, D. 2009. A Bayesian sampling approach to exploration in reinforcement learning. In UAI. Brafman, R. I., and Tennenholtz, M. 2002. R-MAX—a general polynomial time algorithm for near-optimal reinforcement learning. Journal of Machine Learning Research 3:213–231. Dearden, R.; Friedman, N.; and Russell, S. 1998. Bayesian Q-Learning. In AAAI. Even-Dar, E.; Mannor, S.; and Mansour, Y. 2006. Action elimination and stopping conditions for the multi-armed bandit and reinforcement learning problems. Journal of Machine Learning Research 7:1079–1105. Fong, P. 1995. A quantitative study of hypothesis selection. In ICML. Guez, A.; Vincent, R.; Avoli, M.; and Pineau, J. 2008. Adaptive treatment of epilepsy via batch-mode reinforcement learning. In IAAI. Kolter, Z., and Ng, A. 2009. Near-Bayesian exploration in polynomial time. In ICML. Poupart, P.; Vlassis, N.; Hoey, J.; and Regan, K. 2006. An analytic solution to discrete Bayesian reinforcement learning. In ICML. Strehl, A., and Littman, M. L. 2005. A theoretical analysis of model-based interval estimation. In ICML. Weissman, T.; Ordentlich, E.; Seroussi, G.; Verdu, S.; and Weinberger, M. J. 2003. Inequalities for the L1 deviation of the empirical distribution. Technical report, HP Labs.
+
+Conclusion
+We presented a formal bound on the number of samples required to identify an optimal policy with high probability in a MDP with initially unknown model parameters as a function of the unknown gap separation g, which is implicitly
+
+Figure 2: Pitt maze domain. Pitts are black squares, walls are grey lines, and the goal is the star state.
+
+221
+
+

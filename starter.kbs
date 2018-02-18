@@ -1,0 +1,4 @@
+("goal" ("entry-fn" "pse" "1"))
+("has-NL" ("entry-fn" "pse" "1") "Finish Release 1.0 of the Revival")
+("severity" ("entry-fn" "pse" "1") "very important")
+("asserter" ("entry-fn" "pse" "1") "unknown")

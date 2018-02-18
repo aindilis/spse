@@ -1,0 +1,15 @@
+Proceedings of the Twentieth International Conference on Automated Planning and Scheduling (ICAPS 2010)
+
+Robotic Agents for Disaster Response Robotics (Invited Talk Abstract)
+
+Daniele Nardi
+Dipartimento di Informatica e Sistemistica, Sapienza Universit` di Roma a Rome, Italy nardi@dis.uniroma1.it
+
+Disaster Response Robotics is a challenging domain, where the need for intelligent robotic agents (as opposed to just robots) is motivated both by technical considerations and in a practical application perspective. In emergency scenarios time is critical. Hence, there is a great demand for tools that improve the effectiveness of operations. Although there are speciﬁc actions that can be accomplished by a robot, such as for example bomb disposal, a key goal of disaster response robots is to acquire knowledge about the scenario. In fact, a robot can gather data in places that would be either dangerous or inaccessible to the human operator. This often means that the robot is typically not under the visual control of the operator, and sometimes also not connected by a communication link. Consequently, teleoperation can be difﬁcult, if not impossible, and the need arises for intelligent and autonomous capabilities. Moreover, the use of multiple robots naturally stands as a possible breakthrough, given also that disaster scenarios are typically spa-
+
+tially distributed. New challenges hence come up in terms of autonomy, cooperation and collective behaviors. In the ﬁrst part of the talk, I brieﬂy overview the state of the art in the ﬁeld of disaster response robotics, in order to support the above sketched analysis. In the second part of the talk, I present some of the research we developed at Sapienza Univ. of Rome, also in collaboration with the Italian Firemen Department. Speciﬁcally, I describe some results in Distributed Situation Assessment, Action Planning and Monitoring, Context-based Design of intelligent robotic agents, Multi-robot Teams for disaster response robotics, and Performance Evaluation Metrics for intelligent robotic agents. Throughout the discussion, I focus on several open challenges that need to be addressed to provide effective solutions for Disaster Response Robotics.
+Copyright c 2010, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+270
+
+

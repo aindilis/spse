@@ -1,0 +1,498 @@
+package SPSE2::GUI::Tab::View2::EditNode;
+
+# Manager::Dialog
+
+use PerlLib::EasyPersist;
+use PerlLib::SwissArmyKnife;
+use SPSE2::GUI::Tab::View2::EditNode::DateTime;
+use SPSE2::GUI::Tab::View2::EditNode::Finance;
+use SPSE2::GUI::Tab::View2::EditNode::Projects;
+
+use Tk;
+
+use Class::MethodMaker
+  new_with_init => 'new',
+  get_set       =>
+  [
+
+   qw / Top1 Verbose Data Fields MyView Rel /
+
+  ];
+
+sub init {
+  my ($self,%args) = @_;
+  $self->MyView($args{View});
+  $self->Verbose($args{Verbose} || 0);
+  my $title;
+  if (exists $args{Node}) {
+    my $node = $args{Node};
+    $self->Data({});
+    $self->Data->{EntryID} = $node->EntryID;
+    $self->Rel(["entry-fn","pse",$self->Data->{EntryID}]);
+    $self->Data->{Source} = $node->Source;
+    $self->Data->{Description} = $node->Description;
+    $self->Data->{Severity} = $node->Severity;
+    $self->Data->{"All Asserted Knowledge"} = $nodeassertions;
+    $title = "Edit Node";
+  }
+  $self->Top1
+    ($args{MainWindow}->Toplevel
+     (
+      -title => $title,
+      -height => 600,
+      -width => 800,
+     ));
+
+  # might make more sense just to sql or iterate over the KB here
+  # rather than query all of these?  then again, hrm, editable versus
+  # consequential?
+
+  # when you do what you need to do when it needs to be done, then you can do what you want to do when you want to"
+
+  my @order = (
+	       "Repeats",
+	       "Repeat Every",
+	       "Starts On",
+	       "Ends On",
+	       "Summary",
+	      );
+
+  my $fields =
+    {
+     "Repeats" => {
+		   Description => "Set the type of recurrence",
+		   Args => ["dropdown"],
+		   TextVar => $self->Data->{Repeats},
+		   Function => sub { $self->SetRepeats(Repeats => ${$self->Fields->{Repeats}->{TextVar}}) },
+		   Options => ["Daily","Every Weekday","Every Mon Wed & Fri","Every Tue & Thu","Weekly","Montly","Yearly"],
+		  },
+     # Daily
+     "Repeat Every" => {
+			Description => "Repeat every certain days",
+			Args => ["dropdown"],
+			TextVar => $self->Data->{Repeats},
+			Function => sub { $self->SetRepeatEvery(Repeat => ${$self->Fields->{"Repeat Every"}->{TextVar}}) },
+			Options => [1..30],
+		       },
+     "Starts On" => {
+		     Description => "Set the day that the repeat starts on",
+		     Args => ["tinytext"],
+		     TextVar => $self->Data->{"Starts On"},
+		    },
+     "Ends On" => {
+		   Description => "Set the day that the repeat ends on",
+		   Args => ["tinytext"],
+		   TextVar => $self->Data->{"Ends On"},
+		   # never or until _
+		  },
+     "Summary" => {
+		   Description => "Summary of the recurrence",
+		   Args => ["tinytext"],
+		   TextVar => $self->Data->{Summary},
+		   Normal => 0,
+		  },
+     # Weekly on weekdays
+     # Weekly on Monday, Wednesday, Friday
+     # Weekly on Tuesday, Thursday
+
+     # Weekly on *
+     "Repeat Every" => {
+			Description => "Repeat every certain weeks",
+			Args => ["dropdown"],
+			TextVar => $self->Data->{Repeats},
+			Function => sub { $self->SetRepeatEvery(Repeat => ${$self->Fields->{"Repeat Every"}->{TextVar}}) },
+			Options => [1..30],
+		       },
+     "Repeat On" => {
+		     Description => "Have a set of radio buttons for each weekday",
+		     Args => ["tinytext"],
+		     TextVar => $self->Data->{Summary},
+		    },
+
+     # Monthly on *
+     "Repeat Every" => {
+			Description => "Repeat every certain weeks",
+			Args => ["dropdown"],
+			TextVar => $self->Data->{Repeats},
+			Function => sub { $self->SetRepeatEvery(Repeat => ${$self->Fields->{"Repeat Every"}->{TextVar}}) },
+			Options => [1..30],
+		       },
+
+     "Repeat By" => {
+		     Description => "Repeat by a certain time",
+		     Args => ["dropdown"],
+		     TextVar => $self->Data->{Repeats},
+		     Function => sub { $self->SetRepeatEvery(Repeat => ${$self->Fields->{"Repeat Every"}->{TextVar}}) },
+		     Options => ["day of the month","day of the week"],
+		    },
+
+     # anuually on $date, every $disp years on $date
+     "Repeat Every" => {
+			Description => "Repeat every certain years",
+			Args => ["dropdown"],
+			TextVar => $self->Data->{Repeats},
+			Function => sub { $self->SetRepeatEvery(Repeat => ${$self->Fields->{"Repeat Every"}->{TextVar}}) },
+			Options => [1..30],
+		       },
+    };
+  $self->Fields($fields);
+
+  $options = $self->Top1->Frame();
+  foreach my $field (@order) {
+    if (! exists $fields->{$field}->{Args}) {
+      $options->Checkbutton
+	(
+	 -text => $field,
+	 -command => sub { },
+	)->pack(-fill => "x");	# , -anchor => 'left');
+    } else {
+      my $frame = $options->Frame(-relief => 'raised', -borderwidth => 2);
+      my @items;
+      foreach my $arg2 (@{$fields->{$field}->{Args}}) {
+	my $ref = ref $arg2;
+	if ($ref eq "ARRAY") {
+	  # skip for now
+	  $options->Checkbutton
+	    (
+	     -text => $field,
+	     -command => sub { },
+	    )->pack(-fill => "x");
+	} elsif ($ref eq "") {
+	  my $state;
+	  if ($fields->{$field}->{Normal}) {
+	    $state = "normal";
+	  } else {
+	    $state = "disabled";
+	  }
+	  if ($arg2 eq "tinytext") {
+	    my $frame2 = $frame->Frame();
+	    my $nameLabel = $frame2->Label
+	      (
+	       -text => $field,
+	       -state => 'disabled',
+	      );
+	    my $name = $frame2->Entry
+	      (
+	       -state => 'disabled',
+	       -relief       => 'sunken',
+	       -borderwidth  => 2,
+	       -textvariable => \$fields->{$field}->{TextVar},
+	       -width        => 25,
+	      );
+	    push @items, {
+			  frame => $frame2,
+			  nameLabel => $nameLabel,
+			  name => $name,
+			 };
+	    $nameLabel->pack(-side => 'left');
+	    $name->pack(-side => 'right');
+	    $name->bind('<Return>' => [ $middle, 'color', Ev(['get'])]);
+	    $self->Fields->{$field}->{Widget} = $name;
+	    if ($self->Fields->{$field}->{TakeFocus}) {
+	      $name->focus;
+	    }
+	  } elsif ($arg2 eq "text") {
+	    my $frame2 = $frame->Frame();
+	    my $nameLabel = $frame2->Label
+	      (
+	       -text => $field,
+	       -state => $state,
+	      );
+	    my $name = $frame2->Text
+	      (
+	       -relief       => 'sunken',
+	       -borderwidth  => 2,
+	       -width        => 80,
+	       -height        => 5,
+	      );
+	    $name->Contents($fields->{$field}->{TextVar});
+	    $name->configure(-state => $state);
+	    push @items, {
+			  frame => $frame2,
+			  nameLabel => $nameLabel,
+			  name => $name,
+			 };
+	    $nameLabel->pack(-side => 'left');
+	    $name->pack(-side => 'right');
+	    $name->bind('<Return>' => [ $middle, 'color', Ev(['get'])]);
+	    $self->Fields->{$field}->{Widget} = $name;
+	    if ($self->Fields->{$field}->{TakeFocus}) {
+	      $name->focus;
+	    }
+	  } elsif ($arg2 eq "function") {
+	    my $frame2 = $frame->Frame();
+	    my $nameLabel = $frame2->Label
+	      (
+	       -text => $field,
+	       -state => 'disabled',
+	      );
+	    my $name = $frame2->Button
+	      (
+	       -text => $field,
+	       -command => sub {$self->Fields->{$field}->{Function}->()},
+	      );
+	    $name->configure(-state => $state);
+	    push @items, {
+			  frame => $frame2,
+			  nameLabel => $nameLabel,
+			  name => $name,
+			 };
+	    $nameLabel->pack(-side => 'left');
+	    $name->pack(-side => 'right');
+	    $self->Fields->{$field}->{Widget} = $name;
+	    if ($self->Fields->{$field}->{TakeFocus}) {
+	      $name->focus;
+	    }
+	  } elsif ($arg2 eq "dropdown") {
+	    my $frame2 = $frame->Frame();
+	    my $nameLabel = $frame2->Label
+	      (
+	       -text => $field,
+	       -state => 'disabled',
+	      );
+
+	    my $name = $frame2->BrowseEntry
+	      (
+	       -variable => \$fields->{$field}->{TextVar},
+	       -width => $fields->{$field}->{Width} || 25,
+	      )->pack;
+	    $name->configure(-state => $state);
+	    # Configure dropdown
+	    $name->configure
+	      (
+	       # What to do when an entry is selected
+	       -browsecmd => $self->Fields->{$field}->{Function},
+	      );
+	    $name->bind
+	      (
+	       '<Return>' => $self->Fields->{$field}->{Function},
+	      );
+	    foreach my $option (@{$self->Fields->{$field}->{Options}}) {
+	      $name->insert('end',$option);
+	    }
+	    push @items, {
+			  frame => $frame2,
+			  nameLabel => $nameLabel,
+			  name => $name,
+			 };
+	    $nameLabel->pack(-side => 'left');
+	    $name->pack(-side => 'right');
+	    # $name->bind('<Return>' => [ $middle, 'color', Ev(['get'])]);
+	    $self->Fields->{$field}->{Widget} = $name;
+	    if ($self->Fields->{$field}->{TakeFocus}) {
+	      $name->focus;
+	    }
+	  } else {
+	    # print Dumper({Huh => $arg2});
+	  }
+	}
+      }
+      my $checkbutton = $frame->Checkbutton
+	(
+	 -text => $field,
+	 -command => sub {
+	   foreach my $item (@items) {
+	     if ($item->{name}->cget('-state') eq 'disabled') {
+	       $item->{name}->configure(-state => "normal");
+	       $item->{nameLabel}->configure(-state => "normal");
+	     } else {
+	       $item->{name}->configure(-state => "disabled");
+	       $item->{nameLabel}->configure(-state => "disabled");
+	     }
+	   }
+	 },
+	);
+      if ($fields->{$field}->{Normal}) {
+	$checkbutton->{'Value'} = 1;
+      } else {
+	$checkbutton->{'Value'} = 0;
+      }
+
+      $checkbutton->pack(-fill => "x");
+      foreach my $item (@items) {
+	$item->{frame}->pack;
+      }
+      $frame->pack();
+    }
+  }
+  $options->pack;
+
+  $buttons = $self->Top1->Frame();
+  if (exists $args{Node}) {
+    $buttons->Button
+      (
+       -text => "Defaults",
+       -command => sub {$self->ActionDefaults},
+      )->pack(-side => "left");
+    $buttons->Button
+      (
+       -text => "Apply",
+       -command => sub {$self->ActionApply},
+      )->pack(-side => "left");
+    $buttons->Button
+      (
+       -text => "Save Configuration",
+       -command => sub {$self->ActionSaveConfiguration},
+      )->pack(-side => "left");
+    $buttons->Button
+      (
+       -text => "Cancel",
+       -command => sub { $self->Cancel(); },
+      )->pack(-side => "right");
+  } else {
+    $buttons->Button
+      (
+       -text => "Create New Node",
+       -command => sub {$self->FindOrCreateNode},
+      )->pack(-side => "left");
+    $buttons->Button
+      (
+       -text => "Cancel",
+       -command => sub { $self->Top1->destroy; },
+      )->pack(-side => "right");
+  }
+  $buttons->pack;
+  $self->Top1->bind
+    (
+     "all",
+     "<Escape>",
+     sub {
+       $self->Cancel();
+     },
+    );
+}
+
+sub ActionSaveConfiguration {
+  my ($self,%args) = @_;
+  # just print out the configuration for now
+  # print Dumper($self->Fields);
+}
+
+sub ActionApply {
+  my ($self,%args) = @_;
+  # go ahead and update any changes to anything, currently
+  # description, status, etc
+  # use metadata to accomplish this, find out where that metadata is
+  # for now just dump the new values
+
+  my $predmap = {
+		 "Description" => "has-NL",
+		 "Severity" => "severity",
+		};
+  foreach my $field (keys %$predmap) {
+    my $value = $self->GetValueForField(Field => $field);
+    if ($field eq "Description") {
+      chomp $value;
+    }
+    print Dumper([$field,$value]);
+    if (defined $value) {
+      my $res = $self->MyView->MyMetadata->SetMetadata
+	(
+	 Predicate => $predmap->{$field},
+	 Item => $self->Rel,
+	 Value => $value,
+	);
+    }
+  }
+}
+
+sub ActionDefaults {
+  my ($self,%args) = @_;
+
+}
+
+sub Execute {
+  my ($self,%args) = @_;
+}
+
+sub ExecuteCommand {
+  my ($self,%args) = @_;
+  # get all the options, and run them
+  # print join(" ",@args)."\n";
+  # iterate over all the frames contained here
+  foreach my $child ($self->Top1->children) {
+    print Dumper($child);
+  }
+}
+
+sub FindOrCreateNode {
+  my ($self,%args) = @_;
+  # now we should have all the information in the fields, go ahead and
+  # first create the node, then just do a "save changes" as you would
+  # any other node.
+
+  my $description = $self->Fields->{Description}->{Widget}->Contents;
+  $description =~ s/\s+$//s;
+  my $node = $self->MyView->DefaultDomain->Model->FindOrCreateNodeHelper
+    (
+     Description => $description,
+    );
+  $self->ActionSaveConfiguration
+    (
+     Node => $node,
+    );
+  my $nodes = $self->MyView->MyNodeManager->GetNode
+    (
+     Description => $description,
+    );
+  $self->MyView->CenterCanvasWindowOnNode
+    (
+     Node => $nodes->[0],
+    );
+  $self->Top1->destroy;
+}
+
+sub Cancel {
+  my ($self,%args) = @_;
+  # check for changes
+
+  # if there are changes, prompt to determine whether to really cancel
+  # or not
+
+  $self->Top1->destroy;
+}
+
+sub SetStatus {
+  my ($self,%args) = @_;
+}
+
+sub SetSeverity {
+  my ($self,%args) = @_;
+}
+
+sub GetValueForField {
+  my ($self,%args) = @_;
+  my $field = $args{Field};
+  # we have to carefully figure out now which one it is, I guess we
+  # can no longer use the heuristic that if it has a widget, then it
+  # has a Contents.  how do you check for whether a given item has a
+  # contents, let's just check the widget's class and if it is in a
+  # class that uses it, like Tk::Entry, then just use that
+
+  if (exists $self->Fields->{$field}->{Widget}) {
+    my $class = ref $self->Fields->{$field}->{Widget};
+    if ($class =~ /^Tk::(Text)$/) {
+      return $self->Fields->{$field}->{Widget}->Contents;
+    }
+  }
+  if (exists $self->Fields->{$field}->{TextVar}) {
+    return $self->Fields->{$field}->{TextVar};
+  }
+}
+
+1;
+
+
+
+Repeats
+	Daily
+	Every Weekday
+	Every Mon Wed & Fri
+	Every Tue & Thu	
+	Weekly
+	Montly
+	Yearly
+Repeat Every (1-30) days
+Starts on : _
+Ends On : Never || Until _
+Summary: *

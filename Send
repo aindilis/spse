@@ -1,0 +1,2 @@
+/var/lib/myfrdcsa/codebases/internal/boss/scripts/namazu/my-nmzgrep MyClient- -f /var/lib/myfrdcsa/codebases/internal/boss/scripts/namazu/namazurc
+namazu -alR 'MyClient-' -f /var/lib/myfrdcsa/codebases/internal/boss/scripts/namazu/namazurc | xargs egrep  'MyClient-' /dev/null

@@ -1,0 +1,175 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2010.7.18)  29 MAR 2011 07:26
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**icaps-2011-paper.tex
+(./icaps-2011-paper.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+(/usr/share/texmf-texlive/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (./aaai.sty
+Conference Style for AAAI for LaTeX 2e -- version of 7 March 2010
+\titlebox=\skip43
+) (/usr/share/texmf-texlive/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/share/texmf-texlive/tex/latex/psnfss/helvet.sty
+Package: helvet 2005/04/12 PSNFSS-v9.2a (WaS) 
+
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+))
+(/usr/share/texmf-texlive/tex/latex/psnfss/courier.sty
+Package: courier 2005/04/12 PSNFSS-v9.2a (WaS) 
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: dvips.def on input line 91.
+
+(/usr/share/texmf-texlive/tex/latex/graphics/dvips.def
+File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+pdfTeX warning (\pdfinfo): not allowed in DVI mode (\pdfoutput <= 0); ignoring 
+it
+(./icaps-2011-paper.aux)
+\openout1 = `icaps-2011-paper.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 25.
+ (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 26.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 26.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 26.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 26.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 27.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 88.
+
+Underfull \hbox (badness 1270) in paragraph at lines 90--117
+\OT1/ptm/m/n/10 theoretic com-pu-ta-tional com-plex-ity of meta-math-e-mat-ics
+ []
+
+[1
+
+
+
+]
+File: images/ps/spse2.ps Graphic file (type eps)
+ <images/ps/spse2.ps>
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 162.
+
+ (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+Underfull \hbox (badness 1635) in paragraph at lines 176--194
+\OT1/ptm/m/n/10 and may be marked with a unary pred-i-cate (such as
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 176--194
+
+ []
+
+
+Underfull \hbox (badness 1824) in paragraph at lines 195--197
+\OT1/ptm/m/it/10 Agent, Intelligent-Tutoring, In-ven-tory, Meta-math-e-mat-ics,
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 195--197
+\OT1/ptm/m/it/10 Network-Mapper, PIC-Form, Plan-ning, POSI, Social-
+ []
+
+
+Underfull \hbox (badness 3199) in paragraph at lines 195--197
+\OT1/ptm/m/it/10 Networking, Suppositional-Reasoner, Tac-tics, Tem-po-ral,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 195--197
+
+ []
+
+[2]
+File: images/ps/notification-manager.ps Graphic file (type eps)
+ <images/ps/notification-manager.ps>
+Overfull \hbox (3.60535pt too wide) in paragraph at lines 343--343
+[]\OT1/pcr/m/n/9 (implies <LF> (rule-activated <RULE-NUMBER>))[] 
+ []
+
+[3]
+File: images/ps/location-logic.ps Graphic file (type eps)
+ <images/ps/location-logic.ps> [4]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 500.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 500.
+ [5]
+File: images/ps/paperless-office.ps Graphic file (type eps)
+ <images/ps/paperless-office.ps>
+Underfull \hbox (badness 1292) in paragraph at lines 626--638
+\OT1/ptm/m/n/10 Usable Perl/Tk, Emacs and An-droid sys-tems for edit-
+ []
+
+[6] (./icaps-2011-paper.bbl) [7
+
+] (./icaps-2011-paper.aux) ) 
+Here is how much of TeX's memory you used:
+ 685 strings out of 495062
+ 8718 string characters out of 1182644
+ 63326 words of memory out of 3000000
+ 3892 multiletter control sequences out of 15000+50000
+ 12068 words of font info for 34 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 25i,10n,19p,350b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on icaps-2011-paper.dvi (7 pages, 44956 bytes).

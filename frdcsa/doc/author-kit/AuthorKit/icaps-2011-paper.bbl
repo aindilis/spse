@@ -1,0 +1,57 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Balduccini, Baral, and
+  Lierler}{2007}]{Balduccini06knowledgerepresentation}
+Balduccini, M.; Baral, C.; and Lierler, Y.
+\newblock 2007.
+\newblock Knowledge representation and question answering.
+\newblock In Harmelen, V.; Lifschitz; and Porter., eds., {\em Handbook of
+  Knowledge Representation}.
+\newblock chapter~21.
+
+\bibitem[\protect\citeauthoryear{Chaitin}{1974}]{Chaitin74information-theoreti%
+climitations}
+Chaitin, G.~J.
+\newblock 1974.
+\newblock Information-theoretic limitations of formal systems.
+\newblock {\em Journal of the ACM} 21:403--424.
+
+\bibitem[\protect\citeauthoryear{Coslor}{2008}]{coslor2008}
+Coslor, J.~M.
+\newblock 2008.
+\newblock {\em Possibility Thinking}.
+\newblock Lulu.com.
+
+\bibitem[\protect\citeauthoryear{Gerevini, Saetti, and
+  Serina}{2004}]{gerevini2004}
+Gerevini, A.; Saetti, A.; and Serina, I.
+\newblock 2004.
+\newblock {LPG-TD}: a fully automated planner for {PDDL}2.2 domains.
+\newblock {\em 14th Int. Conference on Automated Planning and Scheduling
+  (ICAPS-04)}.
+
+\bibitem[\protect\citeauthoryear{Martin}{2006}]{cio2006}
+Martin, C.
+\newblock 2006.
+\newblock Executive skills: How to improve your ability to focus.
+
+\bibitem[\protect\citeauthoryear{Tasse and Smith}{2008}]{tasse2008}
+Tasse, D., and Smith, N.~A.
+\newblock 2008.
+\newblock {SOUR CREAM}: Toward semantic processing of recipes.
+\newblock Technical Report~5, Carnegie Mellon University, Pittsburgh, PA.
+
+\bibitem[\protect\citeauthoryear{Tsamardinos, Vidal, and
+  Pollack}{2003}]{Tsamardinos03ctp:a}
+Tsamardinos, I.; Vidal, T.; and Pollack, M.
+\newblock 2003.
+\newblock {CTP}: A new constraint-based formalism for conditional, temporal
+  planning.
+
+\bibitem[\protect\citeauthoryear{Turing}{1939}]{turing1939}
+Turing, A.
+\newblock 1939.
+\newblock Systems of logic based on ordinals.
+\newblock In {\em Proc. London Math. Soc.},  161--228.
+
+\end{thebibliography}

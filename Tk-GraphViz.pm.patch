@@ -1,0 +1,53 @@
+--- 5.20.2/Tk/GraphViz.pm	2012-09-25 15:13:16.785067905 -0500
++++ 5.20.2/Tk/GraphViz.pm	2008-12-08 22:33:47.000000000 -0600
+@@ -23,8 +23,6 @@
+ use POSIX qw( :sys_wait_h :errno_h );
+ use Fcntl;
+ 
+-use Data::Dumper;
+-
+ 
+ # Initialize as a derived Tk widget
+ Construct Tk::Widget 'GraphViz';
+@@ -315,9 +313,6 @@
+     }
+   }
+ 
+-  # STDERR->printf( $filename );
+-  # sleep 100;
+-
+   confess unless defined($filename) && defined($delete_file);
+   ($filename, $delete_file);
+ }
+@@ -361,20 +356,7 @@
+   if ( !defined($opt{async}) || !$opt{async} ) {
+     my $pipe = new IO::Pipe;
+     $pipe->reader ( @layout_cmd );
+-    my @item;
+-    while ( <$pipe> ) {
+-      # push @{$self->{layout}}, $_;
+-      my $it = $_;
+-      if ($it =~ /^(.*)\\\n$/) {
+-      	push @item, $1;
+-      } else {
+-      	push @item, $it;
+-      }
+-      if ($it !~ /^(.*)\\\n$/) {
+-      	push @{$self->{layout}}, join("",@item);
+-      	@item = ();
+-      }
+-    }
++    while ( <$pipe> ) { push @{$self->{layout}}, $_; }
+     if ( $opt{delete_file} ) {
+       unlink $filename;
+     }
+@@ -1315,8 +1297,7 @@
+   my %startEnd;
+ 
+   # Process all start/end points (could be none, 1, or 2)
+-  
+-  while ( $pos =~ s/^([se])\s*\,\s*([\d\.]+)\s*\,\s*([\d\.]+)\s+// ) {
++  while ( $pos =~ s/^([se])\s*\,\s*(\d+)\s*\,\s*(\d+)\s+// ) {
+     my ($where, $x, $y) = ($1, $2, $3);
+     $startEnd{$where} = [ $x, $y ];
+   }
